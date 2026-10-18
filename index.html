@@ -1033,13 +1033,13 @@
     </header>
     <div style="padding:20px 24px 8px">
       <div class="backup-actions">
-        <button id="backup-export">JSON書き出し</button>
-        <button class="ghost" id="backup-import-btn">JSON取り込み</button>
+        <button id="backup-export">データを書き出す（バックアップ）</button>
+        <button class="ghost" id="backup-import-btn">データを取り込む</button>
         <input type="file" id="backup-import-file" accept="application/json,.json" style="display:none"/>
       </div>
-      <div class="snap-section">
+      <div class="snap-section" id="wb-section">
         <div class="snap-head">
-          <span class="k">週次バックアップ</span>
+          <span class="k">週次バックアップ（Mac の Chrome）</span>
           <span class="snap-hint" id="wb-status">—</span>
         </div>
         <div class="wb-box">
@@ -1860,7 +1860,7 @@ $("#backup-export").onclick = async ()=>{
   if (await bkSave("マイクレカデッキ", JSON.stringify(cards,null,2)) !== "ok") return;
   localStorage.setItem(WB_LAST_KEY, String(Date.now()));
   localStorage.removeItem(WB_SNOOZE_KEY);
-  wbHideBanner(); wbRender();
+  wbHideBanner(); wbRender(); mcToast("書き出しました");
 };
 $("#backup-import-btn").onclick = ()=>$("#backup-import-file").click();
 $("#backup-import-file").addEventListener("change", async e=>{
@@ -1870,7 +1870,7 @@ $("#backup-import-file").addEventListener("change", async e=>{
     const data = JSON.parse(await file.text());
     if(!Array.isArray(data)) throw new Error("配列形式ではありません");
     if(!data.every(c=>c && typeof c==="object" && "name" in c)) throw new Error("形式がカードデータではありません");
-    if(!confirm(`現在の${cards.length}枚を ${data.length}枚 で置き換えます。\n\n現在のデータは自動スナップショットに保存されます。よろしいですか?`)){ e.target.value=""; return; }
+    if(!(await mcAsk(`現在の${cards.length}枚を ${data.length}枚 で置き換えます。\n現在のデータは自動スナップショットに保存されます。`, "置き換える"))){ e.target.value=""; return; }
     pushSnapshot(cards);
     cards = data.map(c=>({
       id:c.id||uid(), name:c.name||"", type:(c.type==="debit"?"debit":"credit"), purpose:c.purpose||"", rate:(c.rate===""||c.rate==null)?"":(+c.rate||0), point:c.point||"", family:!!c.family, corporate:!!c.corporate, noPhysical:!!c.noPhysical, brand:BRANDS[c.brand]?c.brand:"other",
@@ -1878,8 +1878,8 @@ $("#backup-import-file").addEventListener("change", async e=>{
       fee:+c.fee||0, feeReal:(c.feeReal===""||c.feeReal==null)?"":(+c.feeReal||0), feeMonth:c.feeMonth||"", yearStartMonth:c.yearStartMonth||"", feeCond:c.feeCond||"", closing:c.closing||"", payment:c.payment||"", account:c.account||"", limit:(c.limit===""||c.limit==null)?"":(+c.limit||0), cashLimit:(c.cashLimit===""||c.cashLimit==null)?"":(+c.cashLimit||0), note:c.note||"",
     }));
     save(cards); renderAll(); renderSnapshots();
-    alert(`${cards.length}枚のデータをインポートしました`);
-  }catch(err){ alert(`インポート失敗: ${err.message}`); }
+    mcToast(`${cards.length}枚のデータを取り込みました`);
+  }catch(err){ mcToast(`取り込めませんでした（${err.message}）`); }
   e.target.value="";
 });
 $("#snap-list").addEventListener("click", e=>{
@@ -2016,6 +2016,8 @@ async function wbRender(){
   $("#wb-last").textContent = wbFmtWhen(wbLastAt());
   $("#wb-folder").textContent = wbHandle ? (wbHandle.name||"指定済み") : "未設定";
   const note = $("#wb-note"), pick = $("#wb-pick"), clear = $("#wb-clear");
+  // フォルダへの自動保存は Mac の Chrome／Edge だけ。iPhone・Safari では欄ごと出さない
+  $("#wb-section").style.display = WB_SUPPORTED ? "" : "none";
   if(!WB_SUPPORTED){
     $("#wb-status").textContent = "手動";
     pick.style.display = "none"; clear.style.display = "none";
@@ -2061,21 +2063,21 @@ $("#wb-pick").onclick = async ()=>{
     await wbSaveHandle(h);
     const r = await wbWrite(true);
     await wbRender();
-    if(r.ok){ wbHideBanner(); alert(`「${h.name}」に保存しました（${r.name}）\n以降は週1回、自動で書き出します。`); }
+    if(r.ok){ wbHideBanner(); mcToast(`「${h.name}」に保存しました。以降は週1回、自動で書き出します`); }
   }catch(e){ /* キャンセル */ }
 };
 $("#wb-now").onclick = async ()=>{
   if(wbHandle){
     const r = await wbWrite(true);
     await wbRender();
-    if(r.ok){ wbHideBanner(); alert(`保存しました（${r.name}）`); }
-    else { alert("保存できませんでした。フォルダを指定し直してください。"); }
+    if(r.ok){ wbHideBanner(); mcToast(`保存しました（${r.name}）`); }
+    else { mcToast("保存できませんでした。フォルダを指定し直してください"); }
   } else {
     wbDownload(); await wbRender(); wbHideBanner();
   }
 };
 $("#wb-clear").onclick = async ()=>{
-  if(!confirm("保存先フォルダの指定を解除しますか?\n保存済みのファイルは消えません。")) return;
+  if(!(await mcAsk("保存先フォルダの指定を解除しますか？\n保存済みのファイルは消えません。", "解除する"))) return;
   await wbClearHandle(); wbHandle=null; await wbRender();
 };
 $("#wb-banner-run").onclick = async ()=>{
@@ -2085,7 +2087,7 @@ $("#wb-banner-run").onclick = async ()=>{
   } else if(WB_SUPPORTED){
     $("#backup").click();   // フォルダ未設定 → 設定画面へ
   } else {
-    wbDownload(); wbHideBanner();
+    $("#backup-export").click();
   }
 };
 $("#wb-banner-later").onclick = ()=>{
@@ -2096,7 +2098,7 @@ $("#wb-banner-later").onclick = ()=>{
 renderAll();
 wbCheck();
 // ---------- バージョン ----------
-const APP_VERSION = '1.3.0';
+const APP_VERSION = '1.4.0';
 document.getElementById('versionLabel').textContent = 'v' + APP_VERSION + ' / マイクレカデッキ';
   // ---------- Service Worker + 自動アップデート ----------
   if ('serviceWorker' in navigator) {
@@ -2135,6 +2137,13 @@ document.getElementById('versionLabel').textContent = 'v' + APP_VERSION + ' / �
     document.body.appendChild(b);
     requestAnimationFrame(() => b.classList.add('show'));
   }
+</script>
+<div id="mc-toast" style="position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 16px);transform:translateX(-50%);background:#1a1a1a;color:#fff;border:1px solid rgba(201,169,97,.5);padding:11px 18px;border-radius:12px;font-size:14px;z-index:200;opacity:0;pointer-events:none;transition:opacity .25s;max-width:90vw;text-align:center"></div>
+<div id="mc-ask" style="position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:210;padding:24px"><div style="background:#1a1a1a;color:#f3efe6;border:1px solid rgba(201,169,97,.4);border-radius:16px;padding:20px 18px 14px;max-width:340px;width:100%"><p id="mc-ask-msg" style="margin:0 0 16px;font-size:14.5px;line-height:1.7;white-space:pre-line"></p><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><button type="button" id="mc-ask-no" style="padding:11px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:none;color:inherit;font:inherit;font-weight:700">やめる</button><button type="button" id="mc-ask-yes" style="padding:11px;border-radius:10px;border:0;background:#c9a961;color:#1a1a1a;font:inherit;font-weight:700">OK</button></div></div></div>
+<script>
+  let _mcT = 0;
+  function mcToast(msg){ const t=document.getElementById('mc-toast'); t.textContent=msg; t.style.opacity='1'; clearTimeout(_mcT); _mcT=setTimeout(()=>{t.style.opacity='0';}, 2600); }
+  function mcAsk(msg, yes){ return new Promise(res=>{ const bg=document.getElementById('mc-ask'); document.getElementById('mc-ask-msg').textContent=msg; const y=document.getElementById('mc-ask-yes'), n=document.getElementById('mc-ask-no'); y.textContent=yes||'OK'; bg.style.display='flex'; const done=v=>{ bg.style.display='none'; y.onclick=n.onclick=null; res(v); }; y.onclick=()=>done(true); n.onclick=()=>done(false); }); }
 </script>
 </body>
 </html>
