@@ -1,0 +1,1968 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="クレカデッキ" />
+<meta name="theme-color" content="#1a1f71" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="apple-touch-icon" href="icon-192.png" />
+<title>マイクレカデッキ</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='12' fill='%231a1f71'/><rect x='11' y='19' width='42' height='27' rx='3' fill='%23fffdf8'/><rect x='11' y='25' width='42' height='5' fill='%231a1a1a'/><rect x='16' y='37' width='15' height='4' rx='1' fill='%23b8412a'/><rect x='35' y='37' width='13' height='4' rx='1' fill='%23d4cfbe'/></svg>"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans+JP:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f6f4ef; --paper:#fffdf8;
+    --ink:#1a1a1a; --ink-2:#4a4a4a; --ink-3:#8a8a85;
+    --rule:#e6e2d6; --rule-strong:#d4cfbe;
+    --accent:#b8412a; --gold:#c2982f; --silver:#aab0b6;
+    --good:#3d6e3d; --warn:#b87a1a; --bad:#a32a2a;
+    --net-docomo:#cc0000;
+    --net-au:#ff6600;
+    --net-softbank:#9fa0a0;
+    --net-rakuten:#e91e63;
+    --r:6px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans JP",-apple-system,BlinkMacSystemFont,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased;min-height:100vh}
+  .wrap{max-width:1280px;margin:0 auto;padding:48px 32px 96px}
+  @media (max-width:640px){.wrap{padding:24px 16px 64px}}
+
+  header{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;padding-bottom:24px;border-bottom:1px solid var(--rule-strong);margin-bottom:32px}
+  .brand{display:flex;align-items:baseline;gap:14px}
+  .brand h1{font-family:"Fraunces",serif;font-weight:500;font-size:34px;letter-spacing:-0.02em;margin:0;font-variation-settings:"opsz" 36}
+  .brand .sub{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.14em}
+  .meta{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.14em;text-align:right}
+  .meta b{color:var(--ink);font-weight:500}
+
+  .summary{display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:0;border:1px solid var(--rule-strong);background:var(--paper);margin-bottom:24px;border-radius:var(--r);overflow:hidden}
+  @media (max-width:520px){.summary{grid-template-columns:1fr}}
+  .svc-breakdown .breakdown{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:8px}
+  .svc-breakdown .bd-item{
+    display:inline-flex;align-items:center;gap:6px;
+    font-family:"IBM Plex Sans JP",sans-serif;font-size:14px;color:var(--ink-2);
+  }
+  .svc-breakdown .bd-item b{
+    font-family:"Fraunces",serif;font-size:18px;font-weight:500;color:var(--ink);
+    margin-left:2px;font-variation-settings:"opsz" 18;
+  }
+  .svc-breakdown .bd-dot{width:9px;height:9px;border-radius:2px;display:inline-block}
+  .svc-breakdown .bd-dot.voice{background:#cc0000}
+  .svc-breakdown .bd-dot.sms{background:#b87a1a}
+  .svc-breakdown .bd-dot.data{background:#1d4e89}
+  .stat{padding:18px 20px;border-right:1px solid var(--rule)}
+  .stat:last-child{border-right:0}
+  .stat .l{font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.16em;margin-bottom:6px}
+  .stat .v{font-family:"Fraunces",serif;font-size:26px;font-weight:500;letter-spacing:-0.01em;font-variation-settings:"opsz" 24}
+  .stat .v small{font-size:13px;color:var(--ink-3);font-family:"IBM Plex Sans JP",sans-serif;margin-left:4px}
+
+  .tabs{display:flex;gap:0;border-bottom:1px solid var(--rule-strong);margin-bottom:24px}
+  .tab{font-family:"IBM Plex Sans JP",sans-serif;font-size:13px;font-weight:500;background:transparent;border:0;border-bottom:2px solid transparent;color:var(--ink-3);padding:10px 18px;margin-bottom:-1px;cursor:pointer;letter-spacing:0.02em;border-radius:0}
+  .tab:hover{background:transparent;color:var(--ink);transform:none}
+  .tab.active{color:var(--ink);border-bottom-color:var(--ink)}
+
+  .toolbar{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+  .toolbar h2{font-family:"Fraunces",serif;font-weight:500;font-size:20px;margin:0;letter-spacing:-0.01em}
+  .toolbar .count{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.14em;margin-left:8px}
+  .toolbar .controls{display:flex;gap:8px;align-items:center}
+  button{font-family:"IBM Plex Sans JP",sans-serif;font-size:13px;font-weight:500;border:1px solid var(--ink);background:var(--ink);color:var(--paper);padding:9px 18px;border-radius:var(--r);cursor:pointer;letter-spacing:0.02em;transition:transform .12s ease, background .12s ease}
+  button:hover{background:#000;transform:translateY(-1px)}
+  button.ghost{background:transparent;color:var(--ink);border-color:var(--rule-strong)}
+  button.ghost:hover{background:var(--paper);transform:none;border-color:var(--ink)}
+  button.accent{background:var(--accent);border-color:var(--accent)}
+  button.accent:hover{background:#9e3522}
+  .year-nav{display:flex;align-items:center;gap:0;background:var(--paper);border:1px solid var(--rule-strong);border-radius:var(--r);overflow:hidden}
+  .year-nav button{background:transparent;color:var(--ink);border:0;border-right:1px solid var(--rule);padding:8px 14px;border-radius:0;font-size:15px}
+  .year-nav button:hover{background:var(--bg);transform:none}
+  .year-nav .y{font-family:"Fraunces",serif;font-weight:500;font-size:16px;padding:0 16px;letter-spacing:-0.01em}
+  .year-nav button:last-child{border-right:0;border-left:1px solid var(--rule)}
+
+  .matrix-wrap{background:var(--paper);border:1px solid var(--rule-strong);border-radius:var(--r);overflow-x:auto}
+  table.matrix{width:100%;border-collapse:collapse;font-size:13px;min-width:1000px}
+  table.matrix th,table.matrix td{padding:0;text-align:center;vertical-align:middle}
+  table.matrix thead th{background:var(--bg);border-bottom:1px solid var(--rule-strong);font-family:"JetBrains Mono",monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.14em;color:var(--ink-3);font-weight:500;padding:10px 0;position:sticky;top:0}
+  table.matrix thead th.label-col{text-align:left;padding-left:12px;width:150px;border-right:1px solid var(--rule)}
+  table.matrix thead th.device-col{text-align:left;padding-left:14px;width:130px;border-right:1px solid var(--rule)}
+  table.matrix thead th.svc-col{text-align:center;width:64px;border-right:1px solid var(--rule)}
+  table.matrix thead th.sim-col{text-align:center;width:56px;border-right:1px solid var(--rule)}
+  table.matrix thead th.cost-col{text-align:right;padding-right:14px;width:84px;border-right:1px solid var(--rule-strong)}
+  table.matrix tbody td.cost-col{
+    text-align:right;padding:14px;border-right:1px solid var(--rule-strong);
+    background:var(--paper);font-family:"JetBrains Mono",monospace;
+    font-size:12px;color:var(--ink);white-space:nowrap;
+  }
+  table.matrix tbody td.cost-col .cost-zero{color:var(--ink-3)}
+  table.matrix tbody td.sim-col{text-align:center;border-right:1px solid var(--rule);background:var(--paper);padding:0 4px}
+  .sim-tag{
+    font-family:"JetBrains Mono",monospace;font-size:9px;
+    text-transform:uppercase;letter-spacing:0.08em;font-weight:600;
+    padding:2px 6px;border-radius:2px;line-height:1.2;
+    border:1px solid var(--rule-strong);
+  }
+  .sim-tag.physical{background:var(--bg);color:var(--ink-2)}
+  .sim-tag.esim{background:#2f6b6b;color:#fffdf8;border-color:#2f6b6b}
+  table.matrix thead th.reorder-col{width:32px;border-right:1px solid var(--rule)}
+  table.matrix tbody td.label-col{text-align:left;padding:12px;border-right:1px solid var(--rule);background:var(--paper);position:sticky;left:0;z-index:1}
+  table.matrix tbody td.label-col[data-edit-row]{cursor:pointer;transition:background .12s}
+  table.matrix tbody td.label-col[data-edit-row]:hover{background:var(--bg)}
+  table.matrix tbody td.label-col[data-edit-row]:hover .row-name{text-decoration:underline;text-decoration-color:var(--rule-strong);text-underline-offset:3px}
+  table.matrix tbody td.device-col{
+    text-align:left;padding:14px;border-right:1px solid var(--rule);
+    background:var(--paper);font-size:12px;color:var(--ink-2);
+    font-family:"IBM Plex Sans JP",sans-serif;line-height:1.3;
+  }
+  table.matrix tbody td.device-col.empty{color:var(--ink-3);font-family:"JetBrains Mono",monospace;font-size:11px}
+  table.matrix tbody td.svc-col{
+    text-align:center;border-right:1px solid var(--rule);
+    background:var(--paper);padding:0 4px;
+  }
+  .svc-tags{display:flex;flex-direction:column;gap:2px;align-items:center;justify-content:center}
+  .svc-tag{
+    font-family:"JetBrains Mono",monospace;font-size:9px;
+    text-transform:uppercase;letter-spacing:0.1em;font-weight:600;
+    padding:2px 5px;border-radius:2px;line-height:1.1;
+    background:var(--bg);color:var(--ink-2);
+    border:1px solid var(--rule-strong);
+  }
+  .svc-tag.voice{background:#cc0000;color:#fffdf8;border-color:#cc0000}
+  .svc-tag.sms{background:#b87a1a;color:#fffdf8;border-color:#b87a1a}
+  .svc-tag.data{background:#1d4e89;color:#fffdf8;border-color:#1d4e89}
+  table.matrix tbody td.reorder-col{
+    text-align:center;border-right:1px solid var(--rule);
+    background:var(--paper);padding:0;
+    width:32px;
+  }
+  .reorder{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
+  .reorder button{
+    background:transparent;border:0;color:var(--ink-3);
+    width:24px;height:18px;padding:0;font-size:13px;
+    border-radius:3px;cursor:pointer;line-height:1;
+    font-family:inherit;
+  }
+  .reorder button:hover{background:var(--bg);color:var(--ink);transform:none}
+  .reorder button:disabled{opacity:.2;cursor:not-allowed}
+  .reorder button:disabled:hover{background:transparent;color:var(--ink-3)}
+  table.matrix tbody tr{border-bottom:1px solid var(--rule)}
+  table.matrix tbody tr:last-child{border-bottom:0}
+  .row-name{font-family:"Fraunces",serif;font-weight:500;font-size:15px;letter-spacing:-0.01em;line-height:1.2}
+  .row-number{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--ink-3);margin-top:2px;letter-spacing:0.04em}
+  .row-number::before{content:"…";margin-right:3px;color:var(--ink-3);opacity:.6}
+
+  .cell{height:48px;position:relative;border-right:1px solid var(--rule);background:repeating-linear-gradient(45deg, transparent, transparent 6px, rgba(0,0,0,.025) 6px, rgba(0,0,0,.025) 7px);overflow:hidden}
+  .cell:last-child{border-right:0}
+  .cell.filled{color:var(--paper);font-family:"JetBrains Mono",monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:0.1em;font-weight:500;background:var(--c,#666)}
+  .cell.filled.light{color:#1a1a1a}
+  .cell.start::before{content:"";position:absolute;left:0;top:6px;bottom:6px;width:2px;background:rgba(255,255,255,.6);z-index:2}
+  .cell.filled.light.start::before{background:rgba(0,0,0,.35)}
+  .cell.end::after{content:"";position:absolute;right:0;top:6px;bottom:6px;width:2px;background:rgba(255,255,255,.6);z-index:2}
+  .cell.filled.light.end::after{background:rgba(0,0,0,.35)}
+  .cell .lbl{display:block;padding:0 6px 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;position:relative;z-index:1}
+  /* MVNOの回線種別を底辺の細い帯で表現 */
+  .cell .netbar{
+    position:absolute;left:0;right:0;bottom:0;height:5px;
+    background:var(--n,transparent);
+    z-index:1;
+  }
+  .cell.future{background:transparent;color:var(--ink-3);font-size:10px;font-family:"JetBrains Mono",monospace}
+
+  /* 翌月以降(未確定)のセル: 淡く + 斜線オーバーレイ */
+  .cell.filled.is-future{opacity:.42}
+  .cell.split.is-future{opacity:.42}
+  .cell .future-veil{
+    position:absolute;inset:0;z-index:3;pointer-events:none;
+    background:repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(255,255,255,.4) 5px, rgba(255,255,255,.4) 6px);
+  }
+
+  /* 月内MNPで複数キャリアが入る分割セル */
+  .cell.split{background:transparent;padding:0}
+  .cell.split .split-wrap{
+    display:flex;width:100%;height:48px;
+    align-items:stretch;
+  }
+  .cell.split .seg{
+    display:flex;align-items:center;justify-content:center;
+    position:relative;overflow:hidden;
+    background:var(--c,#666);color:var(--paper);
+    font-family:"JetBrains Mono",monospace;font-size:10px;
+    text-transform:uppercase;letter-spacing:0.08em;font-weight:500;
+    /* 斜めの境界線で月内切替を表現: 右側を斜めにカット */
+    min-width:0;
+  }
+  .cell.split .seg.light{color:#1a1a1a}
+  /* 各セグメント間に斜めの白い境界線を入れる */
+  .cell.split .seg + .seg{
+    margin-left:-7px;
+    clip-path:polygon(7px 0, 100% 0, 100% 100%, 0 100%);
+  }
+  .cell.split .seg:not(:last-child){
+    clip-path:polygon(0 0, 100% 0, calc(100% - 7px) 100%, 0 100%);
+  }
+  .cell.split .seg .seg-lbl{
+    padding:0 4px 5px;line-height:1;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    z-index:1;
+  }
+  .cell.split .seg .netbar{position:absolute;left:0;right:0;bottom:0;height:5px;background:var(--n,transparent)}
+
+  /* povoトッピング購入日バッジ */
+  .cell .topups{
+    position:absolute;top:3px;left:3px;right:3px;
+    display:flex;flex-wrap:wrap;gap:2px;justify-content:flex-start;
+    z-index:2;pointer-events:none;
+  }
+  .cell .topup-day{
+    font-family:"JetBrains Mono",monospace;
+    font-size:8.5px;font-weight:600;line-height:1;
+    padding:2px 3px;border-radius:2px;
+    background:rgba(0,0,0,.55);color:#fff;letter-spacing:0;
+  }
+  .cell.filled.light .topup-day{background:rgba(0,0,0,.75)}
+  .cell.has-topup .lbl{padding-top:14px}
+
+  .legend{padding:14px 18px;background:var(--bg);border-top:1px solid var(--rule-strong);display:flex;flex-direction:column;gap:10px;font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--ink-2)}
+  .legend-row{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+  .legend-row .head{color:var(--ink-3);text-transform:uppercase;letter-spacing:0.14em;font-size:10px;min-width:80px}
+  .legend .swatch{display:inline-flex;align-items:center;gap:6px}
+  .legend .swatch i{width:12px;height:12px;border-radius:2px;display:inline-block;border:1px solid rgba(0,0,0,.08)}
+  .legend .swatch.net i{width:18px;height:5px;border-radius:1px;border:0}
+
+  .lines{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+  .line{background:var(--paper);border:1px solid var(--rule-strong);border-radius:var(--r);padding:20px 22px 18px;display:flex;flex-direction:column;gap:14px}
+  .line-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+  .line-name{font-family:"Fraunces",serif;font-weight:500;font-size:19px;letter-spacing:-0.01em;margin:0;line-height:1.25}
+  .line-number{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--ink-2);margin-top:3px;letter-spacing:0.04em}
+  .line-number::before{content:"…";margin-right:3px;color:var(--ink-3);opacity:.6}
+  .carrier-box{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+  .carrier-pill{
+    display:inline-flex;flex-direction:column;align-items:stretch;
+    border-radius:3px;overflow:hidden;
+    border:1px solid rgba(0,0,0,.06);
+  }
+  .carrier{font-family:"JetBrains Mono",monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:0.14em;color:var(--paper);padding:4px 9px;white-space:nowrap;font-weight:500;background:var(--c,#1a1a1a)}
+  .carrier.light{color:#1a1a1a}
+  .carrier-net{
+    font-family:"JetBrains Mono",monospace;font-size:8.5px;
+    letter-spacing:0.16em;text-transform:uppercase;
+    color:#fff;text-align:center;padding:2px 4px;line-height:1.2;
+    background:var(--n,#666);
+  }
+  .carrier-net.light{color:#1a1a1a}
+  .mnp-flag{font-family:"JetBrains Mono",monospace;font-size:9px;text-transform:uppercase;letter-spacing:0.16em;color:var(--accent);font-weight:500;display:flex;align-items:center;gap:4px}
+  .mnp-flag::before{content:"";width:4px;height:4px;background:var(--accent);border-radius:50%;box-shadow:0 0 0 3px rgba(184,65,42,.15)}
+  .line-meta{display:flex;flex-wrap:wrap;gap:10px 18px;padding-top:12px;border-top:1px dashed var(--rule);font-size:13px;color:var(--ink-2)}
+  .line-meta .item{display:flex;align-items:baseline;gap:6px}
+  .line-meta .k{font-family:"JetBrains Mono",monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:0.14em;color:var(--ink-3)}
+  .line-meta .v{font-size:13px;color:var(--ink);font-weight:500}
+  .line-note{padding-top:12px;border-top:1px dashed var(--rule);font-size:13px;color:var(--ink-2);white-space:pre-wrap}
+
+  /* povoトッピング (カード内) */
+  .topup-section{padding-top:12px;border-top:1px dashed var(--rule)}
+  .topup-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px}
+  .topup-head .k{font-family:"JetBrains Mono",monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:0.14em;color:var(--ink-3)}
+  .topup-head .count-pill{font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--ink-2);background:var(--bg);padding:2px 7px;border-radius:10px}
+  .topup-head .add-topup{
+    font-family:"IBM Plex Sans JP",sans-serif;font-size:11px;font-weight:500;
+    border:1px solid var(--rule-strong);background:var(--paper);color:var(--ink-2);
+    padding:3px 9px;border-radius:3px;cursor:pointer;letter-spacing:0;
+  }
+  .topup-head .add-topup:hover{background:var(--bg);color:var(--ink);transform:none;border-color:var(--ink)}
+  .topup-list{display:flex;flex-wrap:wrap;gap:5px}
+  .topup-chip{
+    display:inline-flex;align-items:center;gap:5px;
+    font-family:"JetBrains Mono",monospace;font-size:11px;
+    background:var(--bg);border:1px solid var(--rule-strong);
+    border-radius:3px;padding:3px 7px;color:var(--ink-2);
+  }
+  .topup-chip .d{font-weight:600;color:var(--ink)}
+  .topup-chip .a{color:var(--ink-3)}
+  .topup-chip .x{
+    border:0;background:transparent;color:var(--ink-3);
+    font-size:13px;line-height:1;padding:0 0 0 2px;cursor:pointer;
+    font-family:inherit;
+  }
+  .topup-chip .x:hover{color:var(--bad);background:transparent;transform:none}
+  .topup-empty{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--ink-3)}
+
+  .history{padding-top:12px;border-top:1px dashed var(--rule)}
+  .history-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .history-head .k{font-family:"JetBrains Mono",monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:0.14em;color:var(--ink-3)}
+  .history-head .count-pill{font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--ink-2);background:var(--bg);padding:2px 7px;border-radius:10px}
+  .timeline{display:flex;flex-direction:column;gap:0;position:relative}
+  .tl-item{display:grid;grid-template-columns:14px 1fr auto;gap:10px;align-items:flex-start;position:relative;padding:5px 0}
+  .tl-item:not(:last-child)::after{content:"";position:absolute;left:6px;top:20px;bottom:-4px;width:1px;background:var(--rule-strong)}
+  .tl-dot{width:13px;height:13px;border-radius:50%;border:2px solid var(--ink);background:var(--paper);margin-top:3px;z-index:1}
+  .tl-item.current .tl-dot{background:var(--c,var(--ink));border-color:var(--c,var(--ink))}
+  .tl-item.from .tl-dot{border-color:var(--c,var(--ink-3));width:11px;height:11px;margin-top:4px;margin-left:1px;background:transparent}
+  .tl-carrier{font-size:14px;font-weight:500;color:var(--ink);letter-spacing:-0.005em;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .tl-carrier .net-tag{
+    font-family:"JetBrains Mono",monospace;font-size:9px;
+    letter-spacing:0.14em;text-transform:uppercase;
+    color:#fff;padding:1px 5px;border-radius:2px;font-weight:500;
+    background:var(--n,#666);
+  }
+  .tl-carrier .net-tag.light{color:#1a1a1a}
+  .tl-item.from .tl-carrier{color:var(--ink-3);font-weight:400;text-decoration:line-through;text-decoration-color:var(--rule-strong)}
+  .tl-item.from .tl-carrier .net-tag{text-decoration:none;opacity:.65}
+  .tl-note{font-size:11.5px;color:var(--ink-3);margin-top:2px;line-height:1.4}
+  .tl-date{font-family:"JetBrains Mono",monospace;font-size:10.5px;color:var(--ink-2);white-space:nowrap;padding-top:4px}
+
+  .line-foot{display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:1px dashed var(--rule);margin-top:auto;gap:8px;flex-wrap:wrap}
+  .status{
+    display:inline-flex;align-items:center;gap:6px;
+    font-family:"JetBrains Mono",monospace;font-size:10.5px;
+    text-transform:uppercase;letter-spacing:0.14em;
+    border:1px solid var(--rule-strong);background:transparent;
+    padding:5px 10px;border-radius:3px;cursor:pointer;
+    font-weight:500;
+    transition:background .12s, border-color .12s;
+  }
+  .status:hover{background:var(--bg);border-color:var(--ink-3);transform:none}
+  .dot{width:7px;height:7px;border-radius:50%;display:inline-block}
+  .status.active .dot{background:var(--good)} .status.active{color:var(--good)}
+  .status.pause .dot{background:var(--warn)} .status.pause{color:var(--warn)}
+  .status.stop .dot{background:var(--bad)} .status.stop{color:var(--bad)}
+
+  .actions{display:flex;gap:2px;flex-wrap:wrap;justify-content:flex-end}
+  .icon-btn{border:none;background:transparent;color:var(--ink-3);padding:6px 8px;border-radius:4px;cursor:pointer;font-size:12px;font-family:inherit}
+  .icon-btn:hover{background:rgba(0,0,0,.04);color:var(--ink);transform:none}
+  .icon-btn.mnp{color:var(--accent);font-weight:500}
+  .icon-btn.mnp:hover{background:rgba(184,65,42,.08);color:var(--accent)}
+
+  .empty{text-align:center;padding:80px 20px;border:1px dashed var(--rule-strong);border-radius:var(--r);background:var(--paper)}
+  .empty p{font-family:"Fraunces",serif;font-size:18px;color:var(--ink-2);margin:0 0 4px}
+  .empty small{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.14em}
+
+  .modal-bg{position:fixed;inset:0;background:rgba(26,26,26,.42);display:none;align-items:flex-start;justify-content:center;padding:40px 16px;z-index:50;overflow-y:auto;backdrop-filter:blur(2px)}
+  .modal-bg.open{display:flex}
+  .modal{background:var(--paper);border-radius:var(--r);width:100%;max-width:520px;border:1px solid var(--rule-strong);box-shadow:0 30px 60px -20px rgba(0,0,0,.25)}
+  .modal header{padding:20px 24px;margin:0;border-bottom:1px solid var(--rule);display:flex;justify-content:space-between;align-items:flex-start}
+  .modal header h3{font-family:"Fraunces",serif;font-weight:500;margin:0;font-size:20px;letter-spacing:-0.01em}
+  .modal header .hint{font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.14em;margin-top:3px}
+  .modal .close{background:transparent;border:none;color:var(--ink-3);font-size:20px;cursor:pointer;padding:4px 8px}
+  .modal .close:hover{color:var(--ink);background:transparent;transform:none}
+  form{padding:20px 24px 8px;display:grid;gap:14px}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media (max-width:480px){.row{grid-template-columns:1fr}}
+  label{display:flex;flex-direction:column;gap:5px}
+  label span{font-family:"JetBrains Mono",monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.14em;color:var(--ink-3)}
+  input,select,textarea{font-family:"IBM Plex Sans JP",sans-serif;font-size:14px;border:1px solid var(--rule-strong);background:var(--bg);padding:9px 11px;border-radius:4px;color:var(--ink);outline:none;transition:border-color .12s}
+  input:focus,select:focus,textarea:focus{border-color:var(--ink)}
+  textarea{resize:vertical;min-height:60px;font-family:inherit}
+  .form-actions{display:flex;justify-content:flex-end;gap:8px;padding:14px 24px 20px;border-top:1px solid var(--rule);margin-top:14px}
+
+  .carrier-hint{
+    font-family:"JetBrains Mono",monospace;font-size:10px;
+    color:var(--ink-3);margin-top:4px;
+    display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+  }
+  .carrier-hint i{
+    width:10px;height:10px;border-radius:2px;display:inline-block;
+    border:1px solid rgba(0,0,0,.1);
+  }
+
+  /* 回線種別セグメントセレクタ */
+  .network-seg{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:0;
+    border:1px solid var(--rule-strong);border-radius:4px;overflow:hidden;
+    background:var(--bg);
+  }
+  .network-seg label{
+    cursor:pointer;display:flex;align-items:center;justify-content:center;
+    padding:9px 4px;font-size:11px;font-weight:500;color:var(--ink-2);
+    border-right:1px solid var(--rule);position:relative;
+    font-family:"IBM Plex Sans JP",sans-serif;
+    transition:background .12s;
+    text-align:center;letter-spacing:.02em;gap:0;
+  }
+  .network-seg label:last-child{border-right:0}
+  .network-seg input[type="radio"]{position:absolute;opacity:0;pointer-events:none}
+  .network-seg label:hover{background:var(--paper)}
+  .network-seg label.sel{background:var(--n,#666);color:#fff;font-weight:600}
+  .network-seg label.sel.light{color:#1a1a1a}
+  .network-seg label .nlbl{display:block}
+  .network-seg-hint{
+    font-family:"JetBrains Mono",monospace;font-size:10px;
+    color:var(--ink-3);margin-top:5px;
+  }
+
+  /* 回線種別 (フォーム内) */
+  .svc-seg{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:0;
+    border:1px solid var(--rule-strong);border-radius:4px;overflow:hidden;
+    background:var(--bg);
+  }
+  .svc-seg label{
+    cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;
+    padding:9px 4px;font-size:12px;font-weight:500;color:var(--ink-2);
+    border-right:1px solid var(--rule);
+    font-family:"IBM Plex Sans JP",sans-serif;
+    transition:background .12s;letter-spacing:.02em;
+  }
+  .svc-seg label:last-child{border-right:0}
+  .svc-seg input[type=radio]{position:absolute;opacity:0;pointer-events:none}
+  .svc-seg label:hover{background:var(--paper)}
+  .svc-seg label.sel{background:var(--ink);color:#fffdf8}
+  .svc-seg label[data-s="voice"].sel{background:#cc0000}
+  .svc-seg label[data-s="sms"].sel{background:#b87a1a}
+  .svc-seg label[data-s="data"].sel{background:#1d4e89}
+  /* SIM種別セレクタ (3列) */
+  #f-sim{grid-template-columns:repeat(3,1fr)}
+  #f-sim label[data-s="physical"].sel{background:var(--ink)}
+  #f-sim label[data-s="esim"].sel{background:#2f6b6b}
+
+  .mnp-preview{background:var(--bg);border:1px dashed var(--rule-strong);border-radius:4px;padding:14px 16px;font-size:15px;color:var(--ink-2);display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:20px 24px 0}
+
+  /* バックアップモーダル */
+  .backup-actions{
+    display:flex;gap:8px;flex-wrap:wrap;padding-bottom:18px;
+    border-bottom:1px solid var(--rule);margin-bottom:18px;
+  }
+  .snap-section{margin-bottom:8px}
+  .snap-head{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:10px;
+  }
+  .snap-head .k{
+    font-family:"JetBrains Mono",monospace;font-size:10px;
+    text-transform:uppercase;letter-spacing:0.14em;color:var(--ink-3);
+  }
+  .snap-hint{
+    font-family:"JetBrains Mono",monospace;font-size:10px;
+    color:var(--ink-3);
+  }
+  .snap-list{
+    display:flex;flex-direction:column;gap:6px;
+    max-height:300px;overflow-y:auto;
+  }
+  .snap-item{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:10px 12px;background:var(--bg);
+    border:1px solid var(--rule-strong);border-radius:4px;gap:10px;
+  }
+  .snap-item .snap-meta{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+  .snap-item .snap-date{
+    font-family:"IBM Plex Sans JP",sans-serif;font-size:13px;
+    color:var(--ink);font-weight:500;
+  }
+  .snap-item .snap-info{
+    font-family:"JetBrains Mono",monospace;font-size:10.5px;
+    color:var(--ink-3);
+  }
+  .snap-item .snap-actions{display:flex;gap:4px}
+  .snap-item button{
+    font-size:11px;padding:5px 10px;font-weight:500;
+    border-radius:3px;
+  }
+  .snap-empty{
+    text-align:center;padding:30px 10px;color:var(--ink-3);
+    font-family:"JetBrains Mono",monospace;font-size:11px;
+    background:var(--bg);border:1px dashed var(--rule-strong);border-radius:4px;
+  }
+  .mnp-preview .from{color:var(--ink-3);text-decoration:line-through}
+  .mnp-preview .arrow{color:var(--accent);font-weight:500;font-size:18px}
+  .mnp-preview .to{color:var(--ink);font-weight:600}
+
+  .hidden{display:none}
+  footer{margin-top:48px;padding-top:20px;border-top:1px solid var(--rule);font-family:"JetBrains Mono",monospace;font-size:10.5px;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.14em;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+
+  /* === クレカ版 追加スタイル === */
+  /* 国際ブランド色 */
+  :root{
+    --brand-visa:#1a1f71; --brand-master:#e2231a; --brand-jcb:#1a7a44;
+    --brand-amex:#1c7fa0; --brand-diners:#6b3a8f; --brand-other:#8a8a85;
+  }
+  /* ブランドタグ */
+  .brand-tag{
+    display:inline-block;font-family:"JetBrains Mono",monospace;font-size:9px;
+    text-transform:uppercase;letter-spacing:0.06em;font-weight:600;
+    padding:3px 7px;border-radius:2px;line-height:1.2;
+    color:#fffdf8;background:var(--c,#8a8a85);white-space:nowrap;
+  }
+  /* 締め日/支払日カラム */
+  table.matrix thead th.cyc-col{text-align:center;width:116px;border-right:1px solid var(--rule)}
+  /* カード名下のブランドミニ表示 */
+  .row-sub{display:flex;align-items:center;gap:6px;margin-top:3px;flex-wrap:wrap}
+  .row-sub .brand-mini{
+    font-family:"JetBrains Mono",monospace;font-size:8.5px;font-weight:600;letter-spacing:0.04em;
+    color:#fffdf8;background:var(--c,#8a8a85);border-radius:2px;padding:1px 4px;line-height:1.3;flex-shrink:0;
+  }
+  .row-sub .rate-mini{font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--ink-2);border:1px solid var(--rule-strong);border-radius:2px;padding:0 4px;line-height:1.4;flex-shrink:0}
+  /* 年表: 利用限度額・キャッシング枠 */
+  td.cyc-col .cyc-limit{margin-top:4px;display:flex;gap:4px;justify-content:center;flex-wrap:wrap}
+  td.cyc-col .cyc-limit .lm{font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--ink-2);border:1px solid var(--rule-strong);border-radius:2px;padding:0 4px;line-height:1.4;white-space:nowrap}
+  td.cyc-col .cyc-limit .lm.cash{color:var(--ink-3);border-style:dashed}
+  /* 統合した「次の年会費」ブロック */
+  td.cyc-col .cyc-nf{margin-top:5px;padding-top:5px;border-top:1px dotted var(--rule-strong)}
+  table.matrix tbody td.cyc-col{
+    text-align:center;border-right:1px solid var(--rule);
+    background:var(--paper);font-family:"JetBrains Mono",monospace;
+    font-size:11px;color:var(--ink-2);padding:8px 8px;
+  }
+  table.matrix tbody td.cyc-col .cyc-pay{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--ink);font-weight:500}
+  table.matrix tbody td.cyc-col .cyc-acct{font-family:"IBM Plex Sans JP",sans-serif;font-size:10.5px;color:var(--ink-3);margin-top:2px;line-height:1.3}
+  table.matrix tbody td.cyc-col .cyc-empty{color:var(--ink-3)}
+  /* セル内マーク (¥=年会費がかかる月 / ▶=カード年度の開始月) */
+  .cell .cell-marks{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    display:flex;gap:3px;align-items:center;z-index:2;pointer-events:none;line-height:1;
+  }
+  .cell.base-cell .cell-marks{top:8px;transform:translateX(-50%)}
+  .cell .mk{font-family:"JetBrains Mono",monospace;font-weight:700;line-height:1}
+  .cell .mk-fee{color:var(--gold);font-size:14px}
+  .cell .mk-start{color:var(--silver);font-size:10px}
+  .cell.base-cell.has-mark .mo-num{padding-top:16px}
+
+  /* サマリーのブランド内訳ドット */
+  .svc-breakdown .bd-dot.b-visa{background:var(--brand-visa)}
+  .svc-breakdown .bd-dot.b-master{background:var(--brand-master)}
+  .svc-breakdown .bd-dot.b-jcb{background:var(--brand-jcb)}
+  .svc-breakdown .bd-dot.b-amex{background:var(--brand-amex)}
+  .svc-breakdown .bd-dot.b-diners{background:var(--brand-diners)}
+  .svc-breakdown .bd-dot.b-other{background:var(--brand-other)}
+
+  /* ブランド選択セグメント (フォーム, 6列) */
+  #f-brand{grid-template-columns:repeat(6,1fr)}
+  #f-brand label[data-b="visa"].sel{background:var(--brand-visa)}
+  #f-brand label[data-b="master"].sel{background:var(--brand-master)}
+  #f-brand label[data-b="jcb"].sel{background:var(--brand-jcb)}
+  #f-brand label[data-b="amex"].sel{background:var(--brand-amex)}
+  #f-brand label[data-b="diners"].sel{background:var(--brand-diners)}
+  #f-brand label[data-b="other"].sel{background:var(--brand-other)}
+  /* 種別セグメント */
+  #f-type{grid-template-columns:repeat(2,1fr)}
+  #f-type label[data-t="credit"].sel{background:var(--ink-2)}
+  #f-type label[data-t="debit"].sel{background:var(--ink-2)}
+  /* 種別タグ (デビットのみ表示) */
+  .type-tag{
+    display:inline-block;font-family:"JetBrains Mono",monospace;font-size:8.5px;font-weight:600;
+    text-transform:uppercase;letter-spacing:0.06em;color:var(--ink-2);
+    border:1px solid var(--rule-strong);border-radius:2px;padding:1px 5px;margin-left:7px;
+    vertical-align:middle;line-height:1.4;
+  }
+  /* カードレスタグ */
+  .nocard-tag{
+    display:inline-block;font-family:"JetBrains Mono",monospace;font-size:8.5px;font-weight:600;
+    text-transform:uppercase;letter-spacing:0.06em;color:var(--ink-3);
+    border:1px dashed var(--rule-strong);border-radius:2px;padding:1px 5px;margin-left:7px;
+    vertical-align:middle;line-height:1.4;
+  }
+  /* 法人カードタグ (塗りで区別) */
+  .corp-tag{
+    display:inline-block;font-family:"JetBrains Mono",monospace;font-size:8.5px;font-weight:600;
+    text-transform:uppercase;letter-spacing:0.06em;color:var(--paper);background:var(--ink-2);
+    border:1px solid var(--ink-2);border-radius:2px;padding:1px 5px;margin-left:7px;
+    vertical-align:middle;line-height:1.4;
+  }
+
+  /* カードビュー: 発行会社の小さなドット */
+  .issuer-line{display:flex;align-items:center;gap:7px;margin-top:6px}
+  .issuer-line .idot{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+  .issuer-line .iname{font-family:"IBM Plex Sans JP",sans-serif;font-size:12.5px;color:var(--ink-2)}
+  /* 無料条件・年会費の補足 */
+  .fee-cond{font-family:"IBM Plex Sans JP",sans-serif;font-size:11.5px;color:var(--ink-3);margin-top:3px;line-height:1.4}
+  .fee-big{font-family:"Fraunces",serif;font-weight:500;font-size:15px;color:var(--ink)}
+  .fee-free{color:var(--good)}
+  /* 年表セル: 通算保有月数の数字 */
+  .cell .mo-num{
+    display:flex;align-items:center;justify-content:center;height:100%;
+    font-family:"JetBrains Mono",monospace;font-size:13px;font-weight:600;
+    letter-spacing:0.02em;position:relative;z-index:1;
+  }
+  .cell.filled .mo-num{color:var(--paper)}
+  /* 年会費列: 本来/実質の併記 */
+  table.matrix tbody td.cost-col .cost-orig{
+    display:block;text-decoration:line-through;text-decoration-color:var(--rule-strong);
+    color:var(--ink-3);font-size:10.5px;
+  }
+  table.matrix tbody td.cost-col .cost-real{display:block;color:var(--ink);font-weight:600}
+  /* カードビュー: 本来→実質 */
+  .fee-orig{
+    text-decoration:line-through;text-decoration-color:var(--rule-strong);
+    color:var(--ink-3);font-family:"Fraunces",serif;font-size:14px;
+  }
+  .fee-real-tag{
+    font-family:"JetBrains Mono",monospace;font-size:9px;text-transform:uppercase;
+    letter-spacing:0.1em;color:var(--good);border:1px solid var(--good);
+    border-radius:2px;padding:1px 5px;margin-left:4px;
+  }
+  /* 用途 (年表 label-col) */
+  table.matrix tbody td.label-col .row-use{font-family:"IBM Plex Sans JP",sans-serif;font-size:11px;color:var(--ink-3);line-height:1.3}
+  /* 用途 (カードビュー) */
+  .line-use{font-family:"IBM Plex Sans JP",sans-serif;font-size:13px;color:var(--ink-2);margin-top:4px}
+  /* 家族カードタグ */
+  .fam-tag{
+    display:inline-block;font-family:"JetBrains Mono",monospace;font-size:8.5px;font-weight:600;
+    text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);
+    border:1px solid var(--accent);border-radius:2px;padding:1px 5px;margin-left:7px;
+    vertical-align:middle;line-height:1.4;
+  }
+  /* フォーム チェックボックス行 */
+  label.checkbox-row{flex-direction:row;align-items:center;gap:9px;cursor:pointer}
+  label.checkbox-row input[type=checkbox]{width:18px;height:18px;flex:0 0 auto;accent-color:var(--accent);cursor:pointer;padding:0;margin:0}
+  label.checkbox-row .cb-label{font-family:"IBM Plex Sans JP",sans-serif;font-size:14px;text-transform:none;letter-spacing:0;color:var(--ink)}
+  /* 月ヘッダ (5ヶ月窓) */
+  table.matrix thead th.mhd{text-align:center;min-width:66px;padding:6px 4px;line-height:1.25;border-right:1px solid var(--rule)}
+  table.matrix thead th.mhd .my{display:block;font-family:"JetBrains Mono",monospace;font-size:9px;color:var(--ink-3);height:11px}
+  table.matrix thead th.mhd .mn{display:block;font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--ink-2)}
+  table.matrix thead th.mhd.cur{border-bottom:2px solid var(--accent)}
+  table.matrix thead th.mhd.cur .mn{color:var(--accent);font-weight:600}
+  /* 次の年会費 列 */
+  td.cyc-col .cyc-nf{text-align:center;line-height:1.3}
+  /* 年会費が近い (3ヶ月以内) 強調 */
+  .nf-when.soon{color:var(--accent);font-weight:700}
+  .nf-rest.soon{color:var(--accent)}
+  /* 週次バックアップ */
+  .wb-box{border:1px solid var(--rule);border-radius:3px;padding:12px 14px;background:var(--paper)}
+  .wb-row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:7px}
+  .wb-row .wb-k{font-family:"JetBrains Mono",monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink-3);white-space:nowrap}
+  .wb-row .wb-v{font-family:"IBM Plex Sans JP",sans-serif;font-size:13px;color:var(--ink);text-align:right;word-break:break-all}
+  .wb-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px}
+  .wb-actions button{font-size:12px;padding:7px 11px}
+  .wb-note{font-family:"IBM Plex Sans JP",sans-serif;font-size:11px;color:var(--ink-3);line-height:1.5;margin-top:9px}
+  /* 週次バックアップのお知らせバナー */
+  .wb-banner{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+    border:1px solid var(--accent);border-left-width:3px;border-radius:3px;
+    padding:11px 14px;margin-bottom:18px;background:var(--paper);
+  }
+  .wb-banner-txt{font-family:"IBM Plex Sans JP",sans-serif;font-size:13px;color:var(--ink)}
+  .wb-banner-act{display:flex;gap:7px;flex-shrink:0}
+  .wb-banner-act button{font-size:12px;padding:6px 12px}
+  /* フォームのセクション見出し */
+  .form-sec{
+    font-family:"JetBrains Mono",monospace;font-size:9.5px;text-transform:uppercase;
+    letter-spacing:0.14em;color:var(--ink-3);margin:20px 0 -2px;
+    padding-bottom:5px;border-bottom:1px solid var(--rule);
+  }
+  /* トグルボタンのON状態 */
+  .controls button.ghost.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+  .nf-when{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--ink);font-weight:500}
+  .nf-rest{font-family:"IBM Plex Sans JP",sans-serif;font-size:10px;color:var(--ink-3);margin-top:1px}
+  .nf-amt{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--ink-2);margin-top:3px}
+  .nf-free{font-family:"Fraunces",serif;font-size:14px;color:var(--good)}
+  .nf-orig{text-decoration:line-through;color:var(--ink-3);font-size:10px}
+  /* 当月セルの左右枠 */
+  table.matrix tbody td.cell.cur{box-shadow:inset 2px 0 0 var(--accent), inset -2px 0 0 var(--accent)}
+  /* 通算年月 (基準月セル) */
+  /* 通算期間: 数字を大きく、単位は小さく。年と月は折り返す */
+  table.matrix tbody td.cell .mo-num{
+    display:flex;flex-wrap:wrap;align-items:center;justify-content:center;
+    gap:0 2px;padding:0 3px;text-align:center;line-height:1.15;height:100%;
+  }
+  .mo-num .tn-l{white-space:nowrap}
+  .mo-num .tn-n{font-family:"JetBrains Mono",monospace;font-size:16px;font-weight:700;letter-spacing:0}
+  .mo-num .tn-u{font-family:"IBM Plex Sans JP",sans-serif;font-size:10px;font-weight:500;margin-left:1px}
+  .mo-num .tn-approx{font-size:10px;margin-right:1px;opacity:.85}
+  /* 基準月の列は通算期間が入るので少し広く (列順: 並べ替え/カード/支払 + 月×5) */
+  table.matrix thead th:nth-child(6){min-width:86px}
+  table.matrix tbody td:nth-child(6){min-width:86px}
+  /* 年会費を減らす条件のラベル */
+  .fee-cond .fee-cond-k{display:block;font-family:"JetBrains Mono",monospace;font-size:9px;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink-3);margin-bottom:2px}
+  /* ヘッダ内の補足ラベル (税込など) */
+  table.matrix thead th .th-sub{display:block;font-family:"JetBrains Mono",monospace;font-size:9px;font-weight:400;color:var(--ink-3);letter-spacing:0.04em;margin-top:1px;text-transform:none}
+  /* カードビューの補足注記 */
+  .meta-note{font-family:"IBM Plex Sans JP",sans-serif;font-size:10.5px;color:var(--ink-3)}
+  /* 年表のドラッグ&ドロップ並べ替え */
+  .reorder .drag-handle{cursor:grab;color:var(--ink-3);font-size:16px;line-height:1;user-select:none;display:block;text-align:center;margin-bottom:3px;padding:4px 2px;touch-action:none;-webkit-user-select:none}
+  .reorder .drag-handle:active{cursor:grabbing}
+  #m-body tr.dragging{opacity:0.45}
+  #m-body tr.drop-before td{border-top:2px solid var(--accent)}
+  #m-body tr.drop-after td{border-bottom:2px solid var(--accent)}
+  #updateBanner{position:fixed;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom) + 16px);z-index:1000;display:flex;align-items:center;justify-content:center;gap:8px;background:#1a1f71;color:#fff;border:0;border-radius:14px;padding:14px 18px;font-family:inherit;font-size:14px;font-weight:600;box-shadow:0 8px 28px rgba(26,31,113,.4);cursor:pointer;transform:translateY(140%);transition:transform .35s cubic-bezier(.32,.72,0,1)}
+  #updateBanner.show{transform:translateY(0)}
+  #updateBanner svg{display:block;flex-shrink:0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <h1>マイクレカデッキ</h1>
+      <span class="sub">Credit Cards · Annual Fee Tracker</span>
+    </div>
+    <div class="meta">
+      <div>更新 <b id="now">—</b></div>
+      <div>保存先 <b>このブラウザ</b></div>
+    </div>
+  </header>
+
+  <div class="wb-banner" id="wb-banner" style="display:none">
+    <span class="wb-banner-txt" id="wb-banner-txt">週次バックアップの時期です</span>
+    <span class="wb-banner-act">
+      <button id="wb-banner-run">保存</button>
+      <button class="ghost" id="wb-banner-later">あとで</button>
+    </span>
+  </div>
+
+  <section class="summary">
+    <div class="stat"><div class="l">保有中のカード</div><div class="v" id="s-active">0<small>枚</small></div></div>
+    <div class="stat"><div class="l">年会費 / 年（実質・税込）</div><div class="v">¥<span id="s-fee">0</span><small id="s-fee-orig"></small></div></div>
+    <div class="stat svc-breakdown">
+      <div class="l">ブランド内訳</div>
+      <div class="breakdown" id="s-breakdown"></div>
+    </div>
+  </section>
+
+  <div class="tabs">
+    <button class="tab active" data-view="matrix">年表ビュー</button>
+    <button class="tab" data-view="cards">カードビュー</button>
+  </div>
+
+  <div id="view-matrix">
+    <div class="toolbar">
+      <h2>年表<span class="count" id="m-count"></span></h2>
+      <div class="controls">
+        <div class="year-nav">
+          <button id="y-prev" title="前の月へ">‹</button>
+          <span class="y" id="y-label" title="今月へ戻る">—</span>
+          <button id="y-next" title="次の月へ">›</button>
+        </div>
+        <button class="ghost" id="toggle-stopped" title="解約済みの表示を切替">利用中のみ</button>
+        <button id="add">＋ カード</button>
+      </div>
+    </div>
+    <div class="matrix-wrap">
+      <table class="matrix">
+        <thead id="m-head">
+          <tr>
+            <th class="reorder-col"></th>
+            <th class="label-col">カード</th>
+            <th class="cyc-col">支払 / 口座<span class="th-sub">枠・次の年会費</span></th>
+            <th class="mhd"><span class="my"></span><span class="mn">—</span></th>
+            <th class="mhd"><span class="my"></span><span class="mn">—</span></th>
+            <th class="mhd"><span class="my"></span><span class="mn">—</span></th>
+            <th class="mhd"><span class="my"></span><span class="mn">—</span></th>
+            <th class="mhd"><span class="my"></span><span class="mn">—</span></th>
+          </tr>
+        </thead>
+        <tbody id="m-body"></tbody>
+      </table>
+      <div class="legend" id="legend"></div>
+    </div>
+  </div>
+
+  <div id="view-cards" class="hidden">
+    <div class="toolbar">
+      <h2>カード一覧<span class="count" id="count">0 cards</span></h2>
+      <div class="controls">
+        <button class="ghost" id="backup">バックアップ</button>
+        <button id="add2">＋ カードを追加</button>
+      </div>
+    </div>
+    <div id="cards" class="lines"></div>
+  </div>
+
+  <footer>
+    <span>Local-only · データはこの端末にのみ保存されます</span>
+    <span id="versionLabel"></span>
+  </footer>
+</div>
+
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <header>
+      <div>
+        <h3 id="modal-title">カードを追加</h3>
+        <div class="hint" id="modal-hint">基本情報を登録</div>
+      </div>
+      <button class="close" id="close">×</button>
+    </header>
+    <form id="form">
+      <input type="hidden" id="f-id"/>
+      <div class="row">
+        <label><span>カード名</span><input id="f-name" required placeholder="楽天カード、三井住友ゴールド …"/></label>
+        <label><span>用途</span><input id="f-purpose" placeholder="メイン、ネット決済、サブスク用 …"/></label>
+      </div>
+      <div class="form-sec">ポイント</div>
+      <div class="row">
+        <label><span>還元率(%)</span><input id="f-rate" type="number" min="0" step="0.01" placeholder="1.0"/></label>
+        <label><span>ポイント種別</span><input id="f-point" list="point-list" placeholder="楽天ポイント、Vポイント …" autocomplete="off"/><datalist id="point-list"></datalist></label>
+      </div>
+      <label>
+        <span>種別</span>
+        <div class="svc-seg" id="f-type">
+          <label data-t="credit"><input type="radio" name="ctype" value="credit"/><span>クレジット</span></label>
+          <label data-t="debit"><input type="radio" name="ctype" value="debit"/><span>デビット</span></label>
+        </div>
+      </label>
+      <label>
+        <span>国際ブランド</span>
+        <div class="svc-seg" id="f-brand">
+          <label data-b="visa"><input type="radio" name="brand" value="visa"/><span>VISA</span></label>
+          <label data-b="master"><input type="radio" name="brand" value="master"/><span>Master</span></label>
+          <label data-b="jcb"><input type="radio" name="brand" value="jcb"/><span>JCB</span></label>
+          <label data-b="amex"><input type="radio" name="brand" value="amex"/><span>AMEX</span></label>
+          <label data-b="diners"><input type="radio" name="brand" value="diners"/><span>Diners</span></label>
+          <label data-b="other"><input type="radio" name="brand" value="other"/><span>他</span></label>
+        </div>
+      </label>
+      <label>
+        <span>発行会社 / カード会社</span>
+        <input id="f-issuer" list="issuer-list" placeholder="楽天カード、三井住友カード、JCB …" autocomplete="off"/>
+        <datalist id="issuer-list"></datalist>
+      </label>
+      <div class="row">
+        <label class="checkbox-row"><input type="checkbox" id="f-family"/><span class="cb-label">家族カードあり</span></label>
+        <label class="checkbox-row"><input type="checkbox" id="f-corporate"/><span class="cb-label">法人カードあり</span></label>
+      </div>
+      <label class="checkbox-row"><input type="checkbox" id="f-nocard"/><span class="cb-label">リアルカードなし（カードレス）</span></label>
+      <div class="form-sec">発行・状態</div>
+      <div class="row">
+        <label><span>発行日 / 申込日</span><input id="f-since" type="date"/></label>
+        <label><span>状態</span>
+          <select id="f-status">
+            <option value="active">利用中</option>
+            <option value="stop">解約済</option>
+          </select>
+        </label>
+      </div>
+      <label><span>実際の利用開始(任意・ランクUP前から使っている場合など)</span><input id="f-usingsince" type="date"/><span class="network-seg-hint">入れると通算期間をこの日から数えます</span></label>
+      <div class="row">
+        <label class="checkbox-row"><input type="checkbox" id="f-issueapprox"/><span class="cb-label">発行日は概算</span></label>
+        <label class="checkbox-row"><input type="checkbox" id="f-rankreset"/><span class="cb-label">ランクUPで発行日リセット</span></label>
+      </div>
+      <label id="f-stopped-wrap" style="display:none">
+        <span>解約日</span>
+        <input id="f-stopped" type="date"/>
+        <span class="network-seg-hint">この日までで年表の表示が止まります</span>
+      </label>
+      <div class="form-sec">年会費</div>
+      <div class="row">
+        <label><span>本来の年会費(円 / 年・税込)</span><input id="f-fee" type="number" min="0" step="1" placeholder="0 (無料なら0)"/></label>
+        <label><span>実質の年会費(税込・無料化後)</span><input id="f-feereal" type="number" min="0" step="1" placeholder="未入力なら本来と同じ"/></label>
+      </div>
+      <div class="row">
+        <label><span>年会費の発生月(任意)</span>
+          <select id="f-feemonth">
+            <option value="">未記入（マークなし）</option>
+            <option value="1">1月</option><option value="2">2月</option><option value="3">3月</option>
+            <option value="4">4月</option><option value="5">5月</option><option value="6">6月</option>
+            <option value="7">7月</option><option value="8">8月</option><option value="9">9月</option>
+            <option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
+          </select>
+        </label>
+        <label><span>1年の始まりの月(任意)</span>
+          <select id="f-yearstart">
+            <option value="">未記入（マークなし）</option>
+            <option value="1">1月</option><option value="2">2月</option><option value="3">3月</option>
+            <option value="4">4月</option><option value="5">5月</option><option value="6">6月</option>
+            <option value="7">7月</option><option value="8">8月</option><option value="9">9月</option>
+            <option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
+          </select>
+        </label>
+      </div>
+      <label><span>年会費を減らす・無料にする条件(任意)</span><input id="f-feecond" placeholder="年100万円利用で翌年無料 / 39歳まで永年無料 …"/></label>
+      <div class="form-sec">支払い</div>
+      <div class="row">
+        <label><span>締め日(任意)</span><input id="f-closing" placeholder="15 / 末日 など"/></label>
+        <label><span>支払日(任意)</span><input id="f-payment" placeholder="10 / 27 など"/></label>
+      </div>
+      <label><span>引き落とし口座(任意)</span><input id="f-account" placeholder="楽天銀行、三井住友銀行 ○○支店 …"/></label>
+      <div class="row">
+        <label><span>利用限度額(円・任意)</span><input id="f-limit" type="number" min="0" step="1" placeholder="1000000"/></label>
+        <label><span>キャッシング枠(円・任意)</span><input id="f-cash" type="number" min="0" step="1" placeholder="0 (なしなら0)"/></label>
+      </div>
+      <label><span>メモ</span><textarea id="f-note" placeholder="ポイント還元率、付帯保険、注意事項など"></textarea></label>
+      <div class="form-actions">
+        <button class="ghost" type="button" id="cancel">キャンセル</button>
+        <button type="submit">保存</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-bg" id="backup-modal">
+  <div class="modal">
+    <header>
+      <div>
+        <h3>バックアップ</h3>
+        <div class="hint">書き出し / 取り込み / 自動スナップショット</div>
+      </div>
+      <button class="close" id="backup-close">×</button>
+    </header>
+    <div style="padding:20px 24px 8px">
+      <div class="backup-actions">
+        <button id="backup-export">JSON書き出し</button>
+        <button class="ghost" id="backup-import-btn">JSON取り込み</button>
+        <input type="file" id="backup-import-file" accept="application/json,.json" style="display:none"/>
+      </div>
+      <div class="snap-section">
+        <div class="snap-head">
+          <span class="k">週次バックアップ</span>
+          <span class="snap-hint" id="wb-status">—</span>
+        </div>
+        <div class="wb-box">
+          <div class="wb-row">
+            <span class="wb-k">保存先フォルダ</span>
+            <span class="wb-v" id="wb-folder">未設定</span>
+          </div>
+          <div class="wb-row">
+            <span class="wb-k">最終バックアップ</span>
+            <span class="wb-v" id="wb-last">—</span>
+          </div>
+          <div class="wb-actions">
+            <button class="ghost" id="wb-pick">フォルダを指定</button>
+            <button class="ghost" id="wb-now">今すぐ保存</button>
+            <button class="ghost" id="wb-clear" style="color:var(--bad)">解除</button>
+          </div>
+          <div class="wb-note" id="wb-note"></div>
+        </div>
+      </div>
+      <div class="snap-section">
+        <div class="snap-head">
+          <span class="k">自動スナップショット</span>
+          <span class="snap-hint" id="snap-count">0件</span>
+        </div>
+        <div class="snap-list" id="snap-list"></div>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="ghost" type="button" id="backup-cancel">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const KEY = "credit_cards_v1";
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+const STATUS = {active:{label:"利用中",cls:"active"},stop:{label:"解約済",cls:"stop"}};
+
+// === 国際ブランド ===
+const BRANDS = {
+  visa:   {label:"VISA",       short:"VISA", c:"#1a1f71"},
+  master: {label:"Mastercard", short:"MC",   c:"#e2231a"},
+  jcb:    {label:"JCB",        short:"JCB",  c:"#1a7a44"},
+  amex:   {label:"AMEX",       short:"AMEX", c:"#1c7fa0"},
+  diners: {label:"Diners",     short:"DINE", c:"#6b3a8f"},
+  other:  {label:"その他",     short:"他",   c:"#8a8a85"},
+};
+const BRAND_ORDER = ["visa","master","jcb","amex","diners","other"];
+function brandMeta(k){ return BRANDS[k] || BRANDS.other; }
+
+// 発行会社の候補
+const KNOWN_ISSUERS = [
+  "楽天カード","三井住友カード","三井住友カード(NL)","三井住友カード ゴールド(NL)",
+  "JCB","アメリカン・エキスプレス","エポスカード","PayPayカード","dカード","au PAYカード",
+  "イオンカード","ライフカード","セゾンカード","ビューカード","JALカード","ANAカード",
+  "リクルートカード","オリコカード","MUFGカード","セディナ","ジャックス","アプラス",
+];
+
+const KNOWN_POINTS = ["楽天ポイント","Vポイント","JCB Oki Dokiポイント","メンバーシップ・リワード","dポイント","Pontaポイント","PayPayポイント","WAON POINT","永久不滅ポイント","JREポイント","マイル(JAL)","マイル(ANA)","リクルートポイント","オリコポイント"];
+const PALETTE = ["#1a1a1a","#3d6e3d","#1d4e89","#7a4c9e","#b87a1a","#8a2a2a","#2f6b6b","#5c5c2e","#7c3a5e","#36527a","#3e6b34","#a04b1f","#494966","#6b3a2a","#b8412a"];
+function issuerColor(name){
+  const key = String(name||"").toLowerCase().replace(/[\s\-_\.,/!()]/g,"");
+  if(!key) return "#999";
+  let h = 0;
+  for(let i=0;i<key.length;i++) h = (h*31 + key.charCodeAt(i)) >>> 0;
+  return PALETTE[h % PALETTE.length];
+}
+
+
+// === 保存 / 読込 ===
+const load = () => {
+  try{
+    const d = JSON.parse(localStorage.getItem(KEY));
+    if(Array.isArray(d)) return d;
+  }catch{}
+  return null;
+};
+
+// === スナップショット (自動バックアップ) ===
+const SNAP_KEY = "credit_cards_snapshots";
+const SNAP_MAX = 10;
+const SNAP_MIN_GAP = 60_000;
+function loadSnapshots(){ try{ return JSON.parse(localStorage.getItem(SNAP_KEY))||[] }catch{ return [] } }
+function saveSnapshots(arr){ localStorage.setItem(SNAP_KEY, JSON.stringify(arr)) }
+function pushSnapshot(data){
+  const snaps = loadSnapshots();
+  const now = Date.now();
+  const payload = JSON.stringify(data);
+  if(snaps.length){
+    const last = snaps[0];
+    if(last.payload === payload) return;
+    if(now - last.ts < SNAP_MIN_GAP){
+      snaps[0] = {ts:now, payload, count:data.length};
+      saveSnapshots(snaps); return;
+    }
+  }
+  snaps.unshift({ts:now, payload, count:data.length});
+  if(snaps.length > SNAP_MAX) snaps.length = SNAP_MAX;
+  saveSnapshots(snaps);
+}
+const save = d => { localStorage.setItem(KEY, JSON.stringify(d)); pushSnapshot(d); };
+
+function uid(){return Math.random().toString(36).slice(2,9)}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]))}
+function fmtDate(s){
+  if(!s) return "—";
+  const d = new Date(s); if(isNaN(d)) return s;
+  return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,"0")}.${String(d.getDate()).padStart(2,"0")}`;
+}
+
+let cards = load();
+if(!cards){
+  cards = [];
+}
+
+let baseDate = new Date(); baseDate.setDate(1);
+let currentView = "matrix";
+let showStopped = false;   // 年表: 解約済みも表示するか
+// 表示する5ヶ月（先月・当月・翌3ヶ月、基準月を中心に -1..+3）
+function windowMonths(){
+  const now=new Date(), ny=now.getFullYear(), nm=now.getMonth();
+  const arr=[];
+  for(let off=-1; off<=3; off++){
+    const d=new Date(baseDate.getFullYear(), baseDate.getMonth()+off, 1);
+    arr.push({
+      year:d.getFullYear(), month:d.getMonth()+1,
+      isCurrent:(d.getFullYear()===ny && d.getMonth()===nm),
+      isBase:(off===0),
+      isFuture:(d.getFullYear()>ny || (d.getFullYear()===ny && d.getMonth()>nm)),
+    });
+  }
+  return arr;
+}
+function goToday(){ baseDate=new Date(); baseDate.setDate(1); renderMatrix(); }
+
+// === 期間判定 ===
+function ownedInMonth(card, year, month){
+  const start = card.since ? new Date(card.since) : null;
+  const end = (card.status === "stop" && card.stoppedAt) ? new Date(card.stoppedAt) : null;
+  const monthStart = new Date(year, month-1, 1, 0,0,0);
+  const monthEnd = new Date(year, month, 0, 23,59,59);
+  const s = start || new Date(0);
+  const e = end || new Date(8640000000000000);
+  if(s <= monthEnd && e >= monthStart){
+    return {
+      owned:true,
+      isStart: !!start && start>=monthStart && start<=monthEnd,
+      isEnd:   !!end && end>=monthStart && end<=monthEnd,
+    };
+  }
+  return {owned:false};
+}
+function hasCardInYear(card, year){
+  const start = card.since ? new Date(card.since) : new Date(0);
+  const end = (card.status==="stop" && card.stoppedAt) ? new Date(card.stoppedAt) : new Date(8640000000000000);
+  const ys = new Date(year,0,1,0,0,0), ye = new Date(year,11,31,23,59,59);
+  return start <= ye && end >= ys;
+}
+function feeMonthOf(card){
+  const fm = +card.feeMonth;
+  return (fm>=1 && fm<=12) ? fm : null;   // 未記入は推定しない（マークを出さない）
+}
+// 実質年会費: feeReal が入力されていればそれを採用、なければ本来額
+function hasReal(card){ return card.feeReal!=="" && card.feeReal!=null; }
+function effectiveFee(card){ return hasReal(card) ? (+card.feeReal||0) : (+card.fee||0); }
+// 通算期間の起点（実際の利用開始があればそちら、なければ発行日）
+function tenureStart(card){ return card.usingSince || card.since || ""; }
+// 起点を1ヶ月目とした、その月時点の通算月数
+function monthsOwned(card, year, month){
+  const base = tenureStart(card);
+  if(!base) return null;
+  const d = new Date(base); if(isNaN(d)) return null;
+  return (year - d.getFullYear())*12 + (month - (d.getMonth()+1)) + 1;
+}
+// 通算保有月数を「◯年◯ヶ月」表記に
+// 金額を短く（万円単位、端数は小数1桁まで）
+function fmtMan(v){
+  if(v==="" || v==null) return "";
+  const n=+v||0;
+  if(n===0) return "0";
+  if(n<10000) return n.toLocaleString("ja-JP");
+  const man=n/10000;
+  return (Number.isInteger(man) ? man : Math.round(man*10)/10) + "万";
+}
+function fmtTenure(mo){
+  if(mo==null || mo<1) return "";
+  const y=Math.floor(mo/12), m=mo%12;
+  if(y<=0) return m+"ヶ月";
+  if(m===0) return y+"年";
+  return y+"年"+m+"ヶ月";
+}
+// 年表セル用: 数字を大きく、単位を小さく。長くなる場合は年/月で改行
+function fmtTenureHTML(mo, approx){
+  if(mo==null || mo<1) return "";
+  const y=Math.floor(mo/12), m=mo%12;
+  const pre = approx ? `<span class="tn-u tn-approx">約</span>` : "";
+  const yp = y>0 ? `<span class="tn-n">${y}</span><span class="tn-u">年</span>` : "";
+  const mp = m>0 ? `<span class="tn-n">${m}</span><span class="tn-u">ヶ月</span>` : "";
+  if(y>0 && m>0) return `${pre}<span class="tn-l">${yp}</span><span class="tn-l">${mp}</span>`;
+  return `${pre}<span class="tn-l">${yp||mp}</span>`;
+}
+// 次の年会費（今日基準で次に発生する年月・実質額）
+function nextFeeHTML(card){
+  const fee=+card.fee||0, rf=effectiveFee(card);
+  if(rf<=0){
+    return `<div class="nf-free">無料</div>` + (fee>0?`<div class="nf-orig">本来 ¥${fee.toLocaleString("ja-JP")}</div>`:"");
+  }
+  const fm=feeMonthOf(card);
+  const today=new Date(), cy=today.getFullYear(), cm=today.getMonth()+1;
+  let when="";
+  if(fm){
+    let y=cy; if(cm>fm) y++;
+    const diff=(y-cy)*12+(fm-cm);
+    when = (diff===0)
+      ? `<div class="nf-when soon">今月</div>`
+      : `<div class="nf-when${diff<=3?" soon":""}">${y}年${fm}月</div><div class="nf-rest${diff<=3?" soon":""}">あと${diff}ヶ月</div>`;
+  } else {
+    when = `<div class="nf-rest">発生月 未設定</div>`;
+  }
+  const amt = (fee>rf)
+    ? `<div class="nf-amt"><span class="nf-orig">¥${fee.toLocaleString("ja-JP")}</span> ¥${rf.toLocaleString("ja-JP")}</div>`
+    : `<div class="nf-amt">¥${rf.toLocaleString("ja-JP")}</div>`;
+  return when + amt;
+}
+// 年会費が実質かかる月か。"paid"=かかる / ""=対象外（永年無料・無料化済み）
+function feeDueInMonth(card, year, month){
+  const fee = +card.fee||0;                 // 本来の年会費が無いカードは対象外
+  if(fee<=0) return "";
+  if(feeMonthOf(card)!==month) return "";
+  if(!ownedInMonth(card, year, month).owned) return "";
+  if(card.since){ const sy=new Date(card.since).getFullYear(); if(year<sy) return ""; }
+  return effectiveFee(card)>0 ? "paid" : "";   // 実質かかる月のみマーク（無料化済みは出さない）
+}
+// カード年度の開始月（未記入なら出さない）
+function yearStartMonthOf(card){
+  const m=+card.yearStartMonth;
+  return (m>=1 && m<=12) ? m : null;
+}
+function isYearStartInMonth(card, year, month){
+  const m=yearStartMonthOf(card);
+  if(!m || m!==month) return false;
+  if(!ownedInMonth(card, year, month).owned) return false;
+  if(card.since){ const sy=new Date(card.since).getFullYear(); if(year<sy) return false; }
+  return true;
+}
+
+// === サマリー ===
+function renderSummary(){
+  const active = cards.filter(c=>c.status==="active");
+  $("#s-active").innerHTML = `${active.length}<small>枚</small>`;
+  const realTotal = active.reduce((a,c)=>a+effectiveFee(c),0);
+  const origTotal = active.reduce((a,c)=>a+(+c.fee||0),0);
+  $("#s-fee").textContent = realTotal.toLocaleString("ja-JP");
+  $("#s-fee-orig").textContent = (origTotal!==realTotal) ? ` 本来 ¥${origTotal.toLocaleString("ja-JP")}` : "";
+  // ブランド内訳
+  const cnt = {};
+  for(const c of active){ const b=BRANDS[c.brand]?c.brand:"other"; cnt[b]=(cnt[b]||0)+1; }
+  const bd = $("#s-breakdown");
+  const items = BRAND_ORDER.filter(b=>cnt[b]);
+  if(items.length===0){
+    bd.innerHTML = `<span style="color:var(--ink-3);font-size:13px">—</span>`;
+  } else {
+    bd.innerHTML = items.map(b=>
+      `<span class="bd-item"><span class="bd-dot b-${b}"></span>${esc(BRANDS[b].label)} <b>${cnt[b]}</b></span>`
+    ).join("");
+  }
+}
+
+// === 年表マトリックス ===
+function renderMatrix(){
+  const body = $("#m-body");
+  body.innerHTML = "";
+  const win = windowMonths();
+  $("#y-label").textContent = `${baseDate.getFullYear()}年${baseDate.getMonth()+1}月`;
+  $("#m-count").textContent = ` ${win[0].year}.${String(win[0].month).padStart(2,"0")}–${win[4].year}.${String(win[4].month).padStart(2,"0")}`;
+  // 月ヘッダの更新
+  const mh = $$("#m-head .mhd");
+  win.forEach((w,i)=>{
+    const th=mh[i]; if(!th) return;
+    th.querySelector(".mn").textContent = `${w.month}月`;
+    th.querySelector(".my").textContent = (w.month===1 || i===0) ? `${w.year}` : "";
+    th.classList.toggle("cur", w.isCurrent);
+  });
+  const usedBrands = new Set();
+  const winStart = new Date(win[0].year, win[0].month-1, 1, 0,0,0);
+  const winEnd   = new Date(win[4].year, win[4].month, 0, 23,59,59);
+
+  if(cards.length === 0){
+    body.innerHTML = `<tr><td colspan="8" style="padding:60px 20px;text-align:center"><div class="empty" style="border:0;padding:0"><p>まだカードがありません</p><small>「カードを追加」から登録</small></div></td></tr>`;
+  } else {
+    const visible = cards.filter(c=>{
+      if(!showStopped && c.status==="stop") return false;
+      const s=c.since?new Date(c.since):new Date(0);
+      const e=(c.status==="stop"&&c.stoppedAt)?new Date(c.stoppedAt):new Date(8640000000000000);
+      return s<=winEnd && e>=winStart;
+    });
+    if(visible.length === 0){
+      body.innerHTML = `<tr><td colspan="8" style="padding:60px 20px;text-align:center"><div class="empty" style="border:0;padding:0"><p>この期間に保有していたカードはありません</p><small>‹ › で月を移動 / 月表示で今月へ戻る</small></div></td></tr>`;
+    } else {
+      for(let idx=0; idx<visible.length; idx++){
+        const c = visible[idx];
+        const tr = document.createElement("tr");
+        tr.draggable = true;
+        tr.dataset.cardId = c.id;
+        const bm = brandMeta(c.brand);
+        const realFee = effectiveFee(c);
+        const payTxt = c.payment ? (/^\d+$/.test(c.payment) ? esc(c.payment)+"日" : esc(c.payment)) : "";
+        const cyc = (c.payment||c.account)
+          ? `${payTxt?`<div class="cyc-pay">${payTxt}</div>`:""}${c.account?`<div class="cyc-acct">${esc(c.account)}</div>`:""}`
+          : `<span class="cyc-empty">—</span>`;
+        const upDisabled = idx===0 ? "disabled" : "";
+        const downDisabled = idx===visible.length-1 ? "disabled" : "";
+        let cells = `<td class="reorder-col">
+          <div class="reorder">
+            <span class="drag-handle" title="ドラッグで好きな位置へ移動">⠿</span>
+            <button data-move-up="${c.id}" ${upDisabled} title="上へ">↑</button>
+            <button data-move-down="${c.id}" ${downDisabled} title="下へ">↓</button>
+          </div>
+        </td>
+        <td class="label-col" data-edit-row="${c.id}">
+          <div class="row-name">${esc(c.name||"無題")}${c.type==="debit"?`<span class="type-tag">デビット</span>`:""}${c.corporate?`<span class="corp-tag">法人</span>`:""}${c.noPhysical?`<span class="nocard-tag">カードレス</span>`:""}${c.family?`<span class="fam-tag">家族</span>`:""}</div>
+          <div class="row-sub"><span class="brand-mini" style="--c:${bm.c}">${esc(bm.short)}</span>${(c.rate!=="" && c.rate!=null)?`<span class="rate-mini">${c.rate}%</span>`:""}${c.purpose?`<span class="row-use">${esc(c.purpose)}</span>`:""}</div>
+        </td>`;
+        const limitTxt = (c.limit!=="" && c.limit!=null) ? `枠 ${fmtMan(c.limit)}` : "";
+        const cashTxt = (c.cashLimit!=="" && c.cashLimit!=null) ? `C ${fmtMan(c.cashLimit)}` : "";
+        const limitHTML = (limitTxt||cashTxt)
+          ? `<div class="cyc-limit">${limitTxt?`<span class="lm">${limitTxt}</span>`:""}${cashTxt?`<span class="lm cash">${cashTxt}</span>`:""}</div>`
+          : "";
+        cells += `<td class="cyc-col">${cyc}${limitHTML}<div class="cyc-nf">${nextFeeHTML(c)}</div></td>`;
+
+        for(const w of win){
+          const own = ownedInMonth(c, w.year, w.month);
+          if(!own.owned){
+            cells += `<td class="cell ${w.isFuture?"future":""} ${w.isCurrent?"cur":""}"></td>`;
+            continue;
+          }
+          usedBrands.add(BRANDS[c.brand]?c.brand:"other");
+          const cls = ["cell","filled"];
+          if(own.isStart) cls.push("start");
+          if(own.isEnd) cls.push("end");
+          if(w.isFuture) cls.push("is-future");
+          if(w.isCurrent) cls.push("cur");
+          if(w.isBase) cls.push("base-cell");
+          const due = feeDueInMonth(c, w.year, w.month);
+          const isStart = isYearStartInMonth(c, w.year, w.month);
+          if(due || isStart) cls.push("has-mark");
+          const marks=[];
+          if(isStart) marks.push(`<span class="mk mk-start" aria-hidden="true">▶</span>`);
+          if(due) marks.push(`<span class="mk mk-fee" aria-hidden="true">¥</span>`);
+          const feeHTML = marks.length ? `<span class="cell-marks">${marks.join("")}</span>` : "";
+          const veil = w.isFuture ? `<span class="future-veil"></span>` : "";
+          const mo = monthsOwned(c, w.year, w.month);
+          const approx = (c.issueApprox && !c.usingSince);
+          const tenure = w.isBase ? fmtTenureHTML(mo, approx) : "";
+          const title = `${esc(c.name)} / ${bm.label} / ${w.year}-${String(w.month).padStart(2,"0")}`
+            + (mo!=null?` · ${fmtTenure(mo)}`:"")
+            + (own.isStart?" (発行)":"") + (own.isEnd?" (解約)":"")
+            + (due?` · 年会費 ¥${realFee.toLocaleString("ja-JP")} がかかる月`:"")
+            + (isStart?` · カード年度の開始月`:"") + (w.isFuture?" (予定)":"");
+          cells += `<td class="${cls.join(" ")}" style="--c:${bm.c}" title="${esc(title)}">${feeHTML}<span class="mo-num">${tenure}</span>${veil}</td>`;
+        }
+        tr.innerHTML = cells;
+        body.appendChild(tr);
+      }
+    }
+  }
+
+  const legend = $("#legend");
+  if(usedBrands.size===0){
+    legend.innerHTML = `<div class="legend-row"><span style="color:var(--ink-3)">この期間に保有していたカードはありません</span></div>`;
+  } else {
+    let html = `<div class="legend-row"><span class="head">Brand</span>` +
+      BRAND_ORDER.filter(b=>usedBrands.has(b)).map(b=>{
+        const m=BRANDS[b];
+        return `<span class="swatch"><i style="background:${m.c}"></i>${esc(m.label)}</span>`;
+      }).join("") + `</div>`;
+    html += `<div class="legend-row"><span class="head">マーク</span><span class="swatch"><b style="color:var(--silver);font-family:'JetBrains Mono',monospace;font-weight:700;font-size:11px">▶</b> 1年の始まり</span><span class="swatch"><b style="color:var(--gold);font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px">¥</b> 年会費がかかる月</span></div>`;
+    html += `<div class="legend-row"><span class="head">表示</span><span class="swatch" style="color:var(--ink-2)">基準月セルの ◯年◯ヶ月 ＝ 通算保有期間</span><span class="swatch" style="color:var(--ink-2)">左右の枠 ＝ 今月</span></div>`;
+    legend.innerHTML = html;
+  }
+}
+
+// === カードビュー ===
+function renderCards(){
+  const list = $("#cards");
+  list.innerHTML = "";
+  if(cards.length === 0){
+    list.innerHTML = `<div class="empty" style="grid-column:1/-1"><p>まだカードがありません</p><small>「カードを追加」から登録</small></div>`;
+    $("#count").textContent = "0 cards";
+    return;
+  }
+  for(const c of cards){
+    const s = STATUS[c.status]||STATUS.active;
+    const bm = brandMeta(c.brand);
+    const fee = +c.fee||0;
+    const realFee = effectiveFee(c);
+    let feeVal;
+    if(hasReal(c) && realFee!==fee){
+      const realTxt = realFee ? `<span class="fee-big">¥${realFee.toLocaleString("ja-JP")}</span> / 年` : `<span class="fee-big fee-free">無料</span>`;
+      feeVal = `<span class="fee-orig">¥${fee.toLocaleString("ja-JP")}</span> → ${realTxt} <span class="fee-real-tag">実質</span>`;
+    } else {
+      feeVal = fee ? `<span class="fee-big">¥${fee.toLocaleString("ja-JP")}</span> / 年` : `<span class="fee-big fee-free">無料</span>`;
+    }
+    const meta = [];
+    const issueNotes=[];
+    if(c.issueApprox) issueNotes.push("概算");
+    if(c.rankReset) issueNotes.push("ランクUPでリセット");
+    meta.push(`<div class="item"><span class="k">発行日</span><span class="v">${fmtDate(c.since)}${issueNotes.length?` <span class="meta-note">(${issueNotes.join("・")})</span>`:""}</span></div>`);
+    if(c.usingSince) meta.push(`<div class="item"><span class="k">実際の利用開始</span><span class="v">${fmtDate(c.usingSince)}</span></div>`);
+    {
+      const now=new Date();
+      const ten=fmtTenure(monthsOwned(c, now.getFullYear(), now.getMonth()+1));
+      if(ten) meta.push(`<div class="item"><span class="k">利用期間</span><span class="v">${(c.issueApprox && !c.usingSince)?"約":""}${ten}</span></div>`);
+    }
+    meta.push(`<div class="item"><span class="k">年会費（税込）</span><span class="v">${feeVal}</span></div>`);
+    if(c.rate!=="" && c.rate!=null) meta.push(`<div class="item"><span class="k">還元率</span><span class="v">${c.rate}%</span></div>`);
+    if(c.point) meta.push(`<div class="item"><span class="k">ポイント</span><span class="v">${esc(c.point)}</span></div>`);
+    if(c.closing) meta.push(`<div class="item"><span class="k">締め日</span><span class="v">${esc(c.closing)}</span></div>`);
+    if(c.payment) meta.push(`<div class="item"><span class="k">支払日</span><span class="v">${esc(c.payment)}</span></div>`);
+    if(c.account) meta.push(`<div class="item"><span class="k">引落口座</span><span class="v">${esc(c.account)}</span></div>`);
+    if(c.limit!=="" && c.limit!=null) meta.push(`<div class="item"><span class="k">利用限度額</span><span class="v">¥${(+c.limit).toLocaleString("ja-JP")}</span></div>`);
+    if(c.cashLimit!=="" && c.cashLimit!=null) meta.push(`<div class="item"><span class="k">キャッシング枠</span><span class="v">${(+c.cashLimit)?`¥${(+c.cashLimit).toLocaleString("ja-JP")}`:"なし"}</span></div>`);
+    if(c.status==="stop" && c.stoppedAt) meta.push(`<div class="item"><span class="k">解約日</span><span class="v">${fmtDate(c.stoppedAt)}</span></div>`);
+
+    const el = document.createElement("article");
+    el.className = "line";
+    el.innerHTML = `
+      <div class="line-head">
+        <div style="min-width:0;flex:1">
+          <h3 class="line-name">${esc(c.name||"無題")}${c.type==="debit"?`<span class="type-tag">デビット</span>`:""}${c.corporate?`<span class="corp-tag">法人</span>`:""}${c.noPhysical?`<span class="nocard-tag">カードレス</span>`:""}${c.family?`<span class="fam-tag">家族</span>`:""}</h3>
+          ${c.purpose?`<div class="line-use">${esc(c.purpose)}</div>`:""}
+          ${c.issuer?`<div class="issuer-line"><span class="idot" style="background:${issuerColor(c.issuer)}"></span><span class="iname">${esc(c.issuer)}</span></div>`:""}
+        </div>
+        <div class="carrier-box">
+          <span class="brand-tag" style="--c:${bm.c}">${esc(bm.label)}</span>
+        </div>
+      </div>
+      <div class="line-meta">${meta.join("")}</div>
+      ${c.feeCond?`<div class="fee-cond"><span class="fee-cond-k">年会費を減らす条件</span>${esc(c.feeCond)}</div>`:""}
+      ${c.note?`<div class="line-note">${esc(c.note)}</div>`:""}
+      <div class="line-foot">
+        <button class="status ${s.cls}" data-status="${c.id}" title="状態を切替"><span class="dot"></span>${s.label}</button>
+        <div class="actions">
+          <button class="icon-btn" data-edit="${c.id}">編集</button>
+          <button class="icon-btn" data-del="${c.id}" style="color:var(--bad)">削除</button>
+        </div>
+      </div>
+    `;
+    list.appendChild(el);
+  }
+  $("#count").textContent = `${cards.length} cards`;
+}
+
+function renderAll(){
+  const d = new Date();
+  $("#now").textContent = `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,"0")}.${String(d.getDate()).padStart(2,"0")} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
+  renderSummary();
+  if(currentView==="matrix") renderMatrix(); else renderCards();
+  // datalist
+  $("#issuer-list").innerHTML = KNOWN_ISSUERS.map(i=>`<option value="${esc(i)}">`).join("");
+  $("#point-list").innerHTML = KNOWN_POINTS.map(i=>`<option value="${esc(i)}">`).join("");
+}
+
+// === タブ切替 ===
+$$(".tab").forEach(t=>{
+  t.onclick = ()=>{
+    $$(".tab").forEach(x=>x.classList.remove("active"));
+    t.classList.add("active");
+    currentView = t.dataset.view;
+    $("#view-matrix").classList.toggle("hidden", currentView!=="matrix");
+    $("#view-cards").classList.toggle("hidden", currentView!=="cards");
+    renderAll();
+  };
+});
+
+// === 年ナビ ===
+$("#y-prev").onclick = ()=>{ baseDate.setMonth(baseDate.getMonth()-1); renderMatrix(); };
+$("#y-next").onclick = ()=>{ baseDate.setMonth(baseDate.getMonth()+1); renderMatrix(); };
+$("#y-label").onclick = goToday;
+$("#toggle-stopped").onclick = ()=>{
+  showStopped = !showStopped;
+  const b = $("#toggle-stopped");
+  b.textContent = showStopped ? "解約済も表示" : "利用中のみ";
+  b.classList.toggle("on", showStopped);
+  renderMatrix();
+};
+
+// === フォーム ===
+const modal = $("#modal");
+function setBrand(val){
+  $$('#f-brand label').forEach(l=>{
+    const on = l.dataset.b===val;
+    l.classList.toggle("sel", on);
+    l.querySelector("input").checked = on;
+  });
+}
+$$('#f-brand label').forEach(l=>{
+  l.onclick = ()=> setBrand(l.dataset.b);
+});
+function setType(val){
+  $$('#f-type label').forEach(l=>{
+    const on = l.dataset.t===val;
+    l.classList.toggle("sel", on);
+    l.querySelector("input").checked = on;
+  });
+}
+$$('#f-type label').forEach(l=>{
+  l.onclick = ()=> setType(l.dataset.t);
+});
+$("#f-status").onchange = ()=>{
+  $("#f-stopped-wrap").style.display = $("#f-status").value==="stop" ? "" : "none";
+};
+
+function openModal(card){
+  $("#f-id").value = card?.id || "";
+  $("#f-name").value = card?.name || "";
+  $("#f-purpose").value = card?.purpose || "";
+  $("#f-rate").value = (card && card.rate!=null && card.rate!=="") ? card.rate : "";
+  $("#f-point").value = card?.point || "";
+  $("#f-family").checked = !!card?.family;
+  $("#f-corporate").checked = !!card?.corporate;
+  $("#f-nocard").checked = !!card?.noPhysical;
+  setBrand(card?.brand || "visa");
+  setType(card?.type || "credit");
+  $("#f-issuer").value = card?.issuer || "";
+  $("#f-since").value = card?.since || "";
+  $("#f-usingsince").value = card?.usingSince || "";
+  $("#f-issueapprox").checked = !!card?.issueApprox;
+  $("#f-rankreset").checked = !!card?.rankReset;
+  $("#f-status").value = card?.status || "active";
+  $("#f-stopped").value = card?.stoppedAt || "";
+  $("#f-stopped-wrap").style.display = (card?.status==="stop") ? "" : "none";
+  $("#f-fee").value = (card && card.fee!=null) ? card.fee : "";
+  $("#f-feereal").value = (card && card.feeReal!=null && card.feeReal!=="") ? card.feeReal : "";
+  $("#f-feemonth").value = card?.feeMonth || "";
+  $("#f-yearstart").value = card?.yearStartMonth || "";
+  $("#f-feecond").value = card?.feeCond || "";
+  $("#f-closing").value = card?.closing || "";
+  $("#f-payment").value = card?.payment || "";
+  $("#f-account").value = card?.account || "";
+  $("#f-limit").value = (card && card.limit!=null && card.limit!=="") ? card.limit : "";
+  $("#f-cash").value = (card && card.cashLimit!=null && card.cashLimit!=="") ? card.cashLimit : "";
+  $("#f-note").value = card?.note || "";
+  $("#modal-title").textContent = card ? "カードを編集" : "カードを追加";
+  $("#modal-hint").textContent = card ? "内容を修正" : "基本情報を登録";
+  modal.classList.add("open");
+  setTimeout(()=>$("#f-name").focus(), 50);
+}
+function closeModal(){ modal.classList.remove("open"); }
+$("#add").onclick = ()=>openModal(null);
+$("#add2").onclick = ()=>openModal(null);
+$("#close").onclick = closeModal;
+$("#cancel").onclick = closeModal;
+modal.addEventListener("click", e=>{ if(e.target===modal) closeModal(); });
+
+$("#form").addEventListener("submit", e=>{
+  e.preventDefault();
+  const id = $("#f-id").value;
+  const brand = ($('#f-brand input:checked')||{}).value || "other";
+  const ctype = ($('#f-type input:checked')||{}).value || "credit";
+  const data = {
+    name: $("#f-name").value.trim(),
+    type: ctype,
+    purpose: $("#f-purpose").value.trim(),
+    rate: $("#f-rate").value==="" ? "" : Math.max(0, +$("#f-rate").value||0),
+    point: $("#f-point").value.trim(),
+    family: $("#f-family").checked,
+    corporate: $("#f-corporate").checked,
+    noPhysical: $("#f-nocard").checked,
+    brand,
+    issuer: $("#f-issuer").value.trim(),
+    since: $("#f-since").value,
+    usingSince: $("#f-usingsince").value,
+    issueApprox: $("#f-issueapprox").checked,
+    rankReset: $("#f-rankreset").checked,
+    status: $("#f-status").value,
+    stoppedAt: $("#f-status").value==="stop" ? $("#f-stopped").value : "",
+    fee: $("#f-fee").value==="" ? 0 : Math.max(0, +$("#f-fee").value||0),
+    feeReal: $("#f-feereal").value==="" ? "" : Math.max(0, +$("#f-feereal").value||0),
+    feeMonth: $("#f-feemonth").value,
+    yearStartMonth: $("#f-yearstart").value,
+    feeCond: $("#f-feecond").value.trim(),
+    closing: $("#f-closing").value.trim(),
+    payment: $("#f-payment").value.trim(),
+    account: $("#f-account").value.trim(),
+    limit: $("#f-limit").value==="" ? "" : Math.max(0, +$("#f-limit").value||0),
+    cashLimit: $("#f-cash").value==="" ? "" : Math.max(0, +$("#f-cash").value||0),
+    note: $("#f-note").value.trim(),
+  };
+  if(!data.name){ alert("カード名を入力してください"); return; }
+  if(id){
+    const i = cards.findIndex(c=>c.id===id);
+    if(i>=0) cards[i] = {...cards[i], ...data};
+  } else {
+    cards.push({id:uid(), ...data});
+  }
+  save(cards); renderAll(); closeModal();
+});
+
+// === カードビュー操作 ===
+$("#cards").addEventListener("click", e=>{
+  const ed = e.target.dataset.edit;
+  const dl = e.target.dataset.del;
+  const st = e.target.closest("[data-status]")?.dataset.status;
+  if(ed){ const c=cards.find(x=>x.id===ed); if(c) openModal(c); }
+  if(dl){
+    const c=cards.find(x=>x.id===dl);
+    if(c && confirm(`「${c.name}」を削除しますか?\nこの操作は元に戻せません (直前の状態はスナップショットに残ります)。`)){
+      cards = cards.filter(x=>x.id!==dl); save(cards); renderAll();
+    }
+  }
+  if(st){
+    const c=cards.find(x=>x.id===st);
+    if(c){
+      if(c.status==="active"){
+        c.status="stop";
+        if(!c.stoppedAt) c.stoppedAt = new Date().toISOString().slice(0,10);
+      } else {
+        c.status="active";
+      }
+      save(cards); renderAll();
+    }
+  }
+});
+
+// === 年表の操作 (並べ替え・行クリック編集) ===
+$("#m-body").addEventListener("click", e=>{
+  const up = e.target.dataset.moveUp;
+  const dn = e.target.dataset.moveDown;
+  const row = e.target.closest("[data-edit-row]")?.dataset.editRow;
+  if(up){ moveCard(up,-1); return; }
+  if(dn){ moveCard(dn,1); return; }
+  if(row && !e.target.closest(".reorder")){ const c=cards.find(x=>x.id===row); if(c) openModal(c); }
+});
+function moveCard(id, dir){
+  const i = cards.findIndex(c=>c.id===id);
+  const j = i+dir;
+  if(i<0 || j<0 || j>=cards.length) return;
+  [cards[i],cards[j]] = [cards[j],cards[i]];
+  save(cards); renderAll();
+}
+
+// 年表の行をドラッグ&ドロップで任意の位置へ
+let dragId = null;
+function clearDropMarks(){
+  document.querySelectorAll("#m-body tr").forEach(r=>r.classList.remove("drop-before","drop-after","dragging"));
+}
+const mBody = $("#m-body");
+mBody.addEventListener("dragstart", e=>{
+  const tr = e.target.closest("tr[data-card-id]");
+  if(!tr){ return; }
+  dragId = tr.dataset.cardId;
+  tr.classList.add("dragging");
+  e.dataTransfer.effectAllowed = "move";
+  try{ e.dataTransfer.setData("text/plain", dragId); }catch{}
+});
+mBody.addEventListener("dragover", e=>{
+  if(!dragId) return;
+  const tr = e.target.closest("tr[data-card-id]");
+  if(!tr || tr.dataset.cardId===dragId){ return; }
+  e.preventDefault();
+  e.dataTransfer.dropEffect = "move";
+  const rect = tr.getBoundingClientRect();
+  const after = e.clientY > rect.top + rect.height/2;
+  document.querySelectorAll("#m-body tr").forEach(r=>r.classList.remove("drop-before","drop-after"));
+  tr.classList.add(after ? "drop-after" : "drop-before");
+});
+mBody.addEventListener("drop", e=>{
+  if(!dragId) return;
+  e.preventDefault();
+  const tr = e.target.closest("tr[data-card-id]");
+  if(!tr){ clearDropMarks(); dragId=null; return; }
+  const targetId = tr.dataset.cardId;
+  const after = tr.classList.contains("drop-after");
+  clearDropMarks();
+  if(targetId===dragId){ dragId=null; return; }
+  const from = cards.findIndex(c=>c.id===dragId);
+  if(from<0){ dragId=null; return; }
+  const [moved] = cards.splice(from,1);
+  let to = cards.findIndex(c=>c.id===targetId);
+  if(to<0){ cards.splice(from,0,moved); dragId=null; return; }
+  cards.splice(after ? to+1 : to, 0, moved);
+  save(cards); renderAll();
+  dragId = null;
+});
+mBody.addEventListener("dragend", ()=>{ clearDropMarks(); dragId=null; });
+
+// --- タッチ (iPhone) での並べ替え ---
+let touchDrag = null;
+mBody.addEventListener("touchstart", e=>{
+  const handle = e.target.closest(".drag-handle");
+  if(!handle) return;
+  const tr = handle.closest("tr[data-card-id]");
+  if(!tr) return;
+  touchDrag = {id:tr.dataset.cardId, tr};
+  tr.classList.add("dragging");
+}, {passive:true});
+mBody.addEventListener("touchmove", e=>{
+  if(!touchDrag) return;
+  e.preventDefault();   // 並べ替え中はスクロールさせない
+  const t = e.touches[0];
+  const el = document.elementFromPoint(t.clientX, t.clientY);
+  const tr = el && el.closest ? el.closest("tr[data-card-id]") : null;
+  document.querySelectorAll("#m-body tr").forEach(r=>r.classList.remove("drop-before","drop-after"));
+  if(!tr || tr.dataset.cardId===touchDrag.id) return;
+  const rect = tr.getBoundingClientRect();
+  const after = t.clientY > rect.top + rect.height/2;
+  tr.classList.add(after ? "drop-after" : "drop-before");
+}, {passive:false});
+mBody.addEventListener("touchend", ()=>{
+  if(!touchDrag) return;
+  const marked = document.querySelector("#m-body tr.drop-before, #m-body tr.drop-after");
+  if(marked){
+    const targetId = marked.dataset.cardId;
+    const after = marked.classList.contains("drop-after");
+    const from = cards.findIndex(c=>c.id===touchDrag.id);
+    if(from>=0 && targetId!==touchDrag.id){
+      const [moved] = cards.splice(from,1);
+      const to = cards.findIndex(c=>c.id===targetId);
+      if(to<0){ cards.splice(from,0,moved); }
+      else { cards.splice(after?to+1:to, 0, moved); save(cards); renderAll(); }
+    }
+  }
+  clearDropMarks();
+  touchDrag = null;
+});
+mBody.addEventListener("touchcancel", ()=>{ clearDropMarks(); touchDrag=null; });
+
+// === バックアップ ===
+const backupModal = $("#backup-modal");
+function fmtSnapTime(ts){
+  const d=new Date(ts);
+  return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,"0")}.${String(d.getDate()).padStart(2,"0")} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
+}
+function relTime(ts){
+  const diff=(Date.now()-ts)/1000;
+  if(diff<60) return "たった今";
+  if(diff<3600) return `${Math.floor(diff/60)}分前`;
+  if(diff<86400) return `${Math.floor(diff/3600)}時間前`;
+  return `${Math.floor(diff/86400)}日前`;
+}
+function renderSnapshots(){
+  const snaps = loadSnapshots();
+  $("#snap-count").textContent = `${snaps.length}件 / 最大${SNAP_MAX}件`;
+  const list = $("#snap-list");
+  if(snaps.length===0){
+    list.innerHTML = `<div class="snap-empty">まだスナップショットがありません<br>データを編集すると自動で記録されます</div>`;
+    return;
+  }
+  list.innerHTML = snaps.map((s,i)=>`
+    <div class="snap-item">
+      <div class="snap-meta">
+        <div class="snap-date">${fmtSnapTime(s.ts)} <span style="color:var(--ink-3);font-weight:400;font-size:11px;font-family:'JetBrains Mono',monospace">· ${relTime(s.ts)}</span></div>
+        <div class="snap-info">${s.count||0}枚</div>
+      </div>
+      <div class="snap-actions">
+        <button class="ghost" data-snap-restore="${i}">復元</button>
+        <button class="ghost" data-snap-download="${i}" title="ダウンロード">⬇</button>
+        <button class="ghost" data-snap-delete="${i}" style="color:var(--bad);border-color:var(--rule-strong)" title="削除">×</button>
+      </div>
+    </div>
+  `).join("");
+}
+$("#backup").onclick = ()=>{ renderSnapshots(); wbRender(); backupModal.classList.add("open"); };
+function closeBackup(){ backupModal.classList.remove("open"); }
+$("#backup-close").onclick = closeBackup;
+$("#backup-cancel").onclick = closeBackup;
+backupModal.addEventListener("click", e=>{ if(e.target===backupModal) closeBackup(); });
+
+  // ---------- バックアップ（全アプリ共通の作法） ----------
+  // iPhone：共有メニュー →「"ファイル"に保存」→ iCloud Drive「アプリのバックアップ」フォルダ
+  // Mac：ダウンロード。ファイル名は「アプリ名_YYYY-MM-DD.json」でそろえる。
+  function bkName(app) { const d = new Date(); return `${app}_${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}.json`; }
+  async function bkSave(app, text) { // 戻り値 'ok' | 'cancel'
+    const name = bkName(app);
+    if (navigator.maxTouchPoints > 0) {
+      try {
+        const file = new File([text], name, { type: 'application/json' });
+        if (navigator.canShare && navigator.share && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file] }); return 'ok'; }
+      } catch (e) { if (e && e.name === 'AbortError') return 'cancel'; }
+    }
+    const url = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
+    const a = document.createElement('a'); a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1500);
+    return 'ok';
+  }
+$("#backup-export").onclick = async ()=>{
+  if (await bkSave("マイクレカデッキ", JSON.stringify(cards,null,2)) !== "ok") return;
+  localStorage.setItem(WB_LAST_KEY, String(Date.now()));
+  localStorage.removeItem(WB_SNOOZE_KEY);
+  wbHideBanner(); wbRender();
+};
+$("#backup-import-btn").onclick = ()=>$("#backup-import-file").click();
+$("#backup-import-file").addEventListener("change", async e=>{
+  const file = e.target.files?.[0];
+  if(!file) return;
+  try{
+    const data = JSON.parse(await file.text());
+    if(!Array.isArray(data)) throw new Error("配列形式ではありません");
+    if(!data.every(c=>c && typeof c==="object" && "name" in c)) throw new Error("形式がカードデータではありません");
+    if(!confirm(`現在の${cards.length}枚を ${data.length}枚 で置き換えます。\n\n現在のデータは自動スナップショットに保存されます。よろしいですか?`)){ e.target.value=""; return; }
+    pushSnapshot(cards);
+    cards = data.map(c=>({
+      id:c.id||uid(), name:c.name||"", type:(c.type==="debit"?"debit":"credit"), purpose:c.purpose||"", rate:(c.rate===""||c.rate==null)?"":(+c.rate||0), point:c.point||"", family:!!c.family, corporate:!!c.corporate, noPhysical:!!c.noPhysical, brand:BRANDS[c.brand]?c.brand:"other",
+      issuer:c.issuer||"", since:c.since||"", usingSince:c.usingSince||"", issueApprox:!!c.issueApprox, rankReset:!!c.rankReset, status:c.status||"active", stoppedAt:c.stoppedAt||"",
+      fee:+c.fee||0, feeReal:(c.feeReal===""||c.feeReal==null)?"":(+c.feeReal||0), feeMonth:c.feeMonth||"", yearStartMonth:c.yearStartMonth||"", feeCond:c.feeCond||"", closing:c.closing||"", payment:c.payment||"", account:c.account||"", limit:(c.limit===""||c.limit==null)?"":(+c.limit||0), cashLimit:(c.cashLimit===""||c.cashLimit==null)?"":(+c.cashLimit||0), note:c.note||"",
+    }));
+    save(cards); renderAll(); renderSnapshots();
+    alert(`${cards.length}枚のデータをインポートしました`);
+  }catch(err){ alert(`インポート失敗: ${err.message}`); }
+  e.target.value="";
+});
+$("#snap-list").addEventListener("click", e=>{
+  const r=e.target.dataset.snapRestore, d=e.target.dataset.snapDownload, x=e.target.dataset.snapDelete;
+  if(r!==undefined){
+    const s=loadSnapshots()[+r]; if(!s) return;
+    if(!confirm(`${fmtSnapTime(s.ts)} の状態 (${s.count}枚) に戻しますか?\n\n現在のデータは新しいスナップショットとして自動保存されます。`)) return;
+    pushSnapshot(cards);
+    try{ cards=JSON.parse(s.payload); save(cards); renderAll(); renderSnapshots(); }catch(err){ alert("復元失敗: "+err.message); }
+  }
+  if(d!==undefined){
+    const s=loadSnapshots()[+d]; if(!s) return;
+    const blob=new Blob([s.payload],{type:"application/json"});
+    const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+    a.download=`credit-cards-snapshot-${new Date(s.ts).toISOString().replace(/[:.]/g,"-").slice(0,19)}.json`; a.click();
+  }
+  if(x!==undefined){
+    const snaps=loadSnapshots(); const s=snaps[+x]; if(!s) return;
+    if(!confirm(`${fmtSnapTime(s.ts)} のスナップショットを削除しますか?`)) return;
+    snaps.splice(+x,1); saveSnapshots(snaps); renderSnapshots();
+  }
+});
+
+document.addEventListener("keydown", e=>{
+  if(e.key==="Escape"){ closeModal(); closeBackup(); }
+  if(currentView==="matrix" && !modal.classList.contains("open") && !backupModal.classList.contains("open")){
+    if(e.key==="ArrowLeft"){ baseDate.setMonth(baseDate.getMonth()-1); renderMatrix(); }
+    if(e.key==="ArrowRight"){ baseDate.setMonth(baseDate.getMonth()+1); renderMatrix(); }
+  }
+});
+
+// ===== 週次バックアップ (Mac のブラウザ向け) =====
+// 指定フォルダへ週1回 JSON を書き出す。File System Access API があれば自動、
+// 無い場合 (Safari など) は週次でお知らせしてダウンロードさせる。
+const WB_LAST_KEY = "credit_cards_backup_last";
+const WB_SNOOZE_KEY = "credit_cards_backup_snooze";
+const WB_INTERVAL = 7*24*60*60*1000;              // 週次
+const WB_SUPPORTED = (typeof window.showDirectoryPicker === "function");
+let wbHandle = null;
+
+// --- フォルダハンドルの保存 (IndexedDB) ---
+function wbDB(){
+  return new Promise((res,rej)=>{
+    const r = indexedDB.open("credit_cards_backup", 1);
+    r.onupgradeneeded = ()=>{ r.result.createObjectStore("handles"); };
+    r.onsuccess = ()=>res(r.result);
+    r.onerror = ()=>rej(r.error);
+  });
+}
+async function wbSaveHandle(h){
+  try{
+    const db = await wbDB();
+    await new Promise((res,rej)=>{
+      const tx = db.transaction("handles","readwrite");
+      tx.objectStore("handles").put(h,"dir");
+      tx.oncomplete = res; tx.onerror = ()=>rej(tx.error);
+    });
+  }catch(e){ console.warn("handle save failed", e); }
+}
+async function wbLoadHandle(){
+  try{
+    const db = await wbDB();
+    return await new Promise((res,rej)=>{
+      const tx = db.transaction("handles","readonly");
+      const q = tx.objectStore("handles").get("dir");
+      q.onsuccess = ()=>res(q.result||null); q.onerror = ()=>rej(q.error);
+    });
+  }catch(e){ return null; }
+}
+async function wbClearHandle(){
+  try{
+    const db = await wbDB();
+    await new Promise((res,rej)=>{
+      const tx = db.transaction("handles","readwrite");
+      tx.objectStore("handles").delete("dir");
+      tx.oncomplete = res; tx.onerror = ()=>rej(tx.error);
+    });
+  }catch(e){}
+}
+
+function wbLastAt(){ const v=localStorage.getItem(WB_LAST_KEY); return v?+v:0; }
+function wbDue(){
+  const snooze = +localStorage.getItem(WB_SNOOZE_KEY)||0;
+  if(Date.now() < snooze) return false;
+  return (Date.now() - wbLastAt()) >= WB_INTERVAL;
+}
+function wbFileName(){
+  const d=new Date(), p=n=>String(n).padStart(2,"0");
+  return `マイクレカデッキ_${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}.json`;
+}
+async function wbPermission(){
+  if(!wbHandle) return "none";
+  try{ return await wbHandle.queryPermission({mode:"readwrite"}); }
+  catch(e){ return "none"; }
+}
+// 指定フォルダへ書き出す。requestOK=true ならユーザー操作として権限を要求できる
+async function wbWrite(requestOK){
+  if(!wbHandle) return {ok:false, reason:"nofolder"};
+  let perm = await wbPermission();
+  if(perm!=="granted"){
+    if(!requestOK) return {ok:false, reason:"needpermission"};
+    try{ perm = await wbHandle.requestPermission({mode:"readwrite"}); }
+    catch(e){ return {ok:false, reason:"needpermission"}; }
+    if(perm!=="granted") return {ok:false, reason:"needpermission"};
+  }
+  try{
+    const fh = await wbHandle.getFileHandle(wbFileName(), {create:true});
+    const w = await fh.createWritable();
+    await w.write(JSON.stringify(cards,null,2));
+    await w.close();
+    localStorage.setItem(WB_LAST_KEY, String(Date.now()));
+    localStorage.removeItem(WB_SNOOZE_KEY);
+    return {ok:true, name:wbFileName()};
+  }catch(e){ return {ok:false, reason:"writefail", error:e}; }
+}
+// フォルダ未設定時のフォールバック: 通常のダウンロード
+function wbDownload(){
+  const blob = new Blob([JSON.stringify(cards,null,2)],{type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = wbFileName();
+  a.click();
+  localStorage.setItem(WB_LAST_KEY, String(Date.now()));
+  localStorage.removeItem(WB_SNOOZE_KEY);
+}
+
+function wbFmtWhen(ts){
+  if(!ts) return "まだ未実施";
+  const d=new Date(ts), p=n=>String(n).padStart(2,"0");
+  const days=Math.floor((Date.now()-ts)/86400000);
+  return `${d.getFullYear()}.${p(d.getMonth()+1)}.${p(d.getDate())} (${days<=0?"今日":days+"日前"})`;
+}
+async function wbRender(){
+  $("#wb-last").textContent = wbFmtWhen(wbLastAt());
+  $("#wb-folder").textContent = wbHandle ? (wbHandle.name||"指定済み") : "未設定";
+  const note = $("#wb-note"), pick = $("#wb-pick"), clear = $("#wb-clear");
+  if(!WB_SUPPORTED){
+    $("#wb-status").textContent = "手動";
+    pick.style.display = "none"; clear.style.display = "none";
+    $("#wb-folder").textContent = "このブラウザでは非対応";
+    note.textContent = "このブラウザはフォルダ保存に対応していません。週次でお知らせするので「今すぐ保存」からダウンロードしてください。Mac の Chrome / Edge ならフォルダを指定して自動保存できます。";
+    return;
+  }
+  pick.style.display = ""; clear.style.display = wbHandle ? "" : "none";
+  const perm = await wbPermission();
+  if(!wbHandle){
+    $("#wb-status").textContent = "未設定";
+    note.textContent = "iCloud Drive などのフォルダを指定すると、週1回そこへ JSON を書き出します。指定は Mac のブラウザで行ってください。";
+  } else if(perm==="granted"){
+    $("#wb-status").textContent = wbDue() ? "保存の時期" : "設定済み";
+    note.textContent = "週1回、アプリを開いたときに自動で書き出します。同じ日に再度保存すると同名ファイルを上書きします。";
+  } else {
+    $("#wb-status").textContent = "許可待ち";
+    note.textContent = "ブラウザを再起動するとフォルダへの許可が切れることがあります。「今すぐ保存」を一度押すと許可し直せます。";
+  }
+}
+
+function wbShowBanner(msg){ $("#wb-banner-txt").textContent = msg; $("#wb-banner").style.display = ""; }
+function wbHideBanner(){ $("#wb-banner").style.display = "none"; }
+
+// 起動時チェック: 期限が来ていれば自動保存、できなければバナーで促す
+async function wbCheck(){
+  wbHandle = WB_SUPPORTED ? await wbLoadHandle() : null;
+  if(!wbDue()){ wbHideBanner(); return; }
+  if(wbHandle && await wbPermission()==="granted"){
+    const r = await wbWrite(false);
+    if(r.ok){ $("#wb-banner-run").style.display="none"; wbShowBanner(`バックアップを保存しました（${r.name}）`); return; }
+  }
+  $("#wb-banner-run").style.display = "";
+  const days = wbLastAt() ? Math.floor((Date.now()-wbLastAt())/86400000) : 0;
+  wbShowBanner(wbLastAt() ? `前回のバックアップから${days}日たちました` : "バックアップがまだありません");
+}
+
+$("#wb-pick").onclick = async ()=>{
+  if(!WB_SUPPORTED) return;
+  try{
+    const h = await window.showDirectoryPicker({mode:"readwrite", id:"credit-cards-backup"});
+    wbHandle = h;
+    await wbSaveHandle(h);
+    const r = await wbWrite(true);
+    await wbRender();
+    if(r.ok){ wbHideBanner(); alert(`「${h.name}」に保存しました（${r.name}）\n以降は週1回、自動で書き出します。`); }
+  }catch(e){ /* キャンセル */ }
+};
+$("#wb-now").onclick = async ()=>{
+  if(wbHandle){
+    const r = await wbWrite(true);
+    await wbRender();
+    if(r.ok){ wbHideBanner(); alert(`保存しました（${r.name}）`); }
+    else { alert("保存できませんでした。フォルダを指定し直してください。"); }
+  } else {
+    wbDownload(); await wbRender(); wbHideBanner();
+  }
+};
+$("#wb-clear").onclick = async ()=>{
+  if(!confirm("保存先フォルダの指定を解除しますか?\n保存済みのファイルは消えません。")) return;
+  await wbClearHandle(); wbHandle=null; await wbRender();
+};
+$("#wb-banner-run").onclick = async ()=>{
+  if(wbHandle){
+    const r = await wbWrite(true);
+    if(r.ok){ wbHideBanner(); } else { $("#backup").click(); }
+  } else if(WB_SUPPORTED){
+    $("#backup").click();   // フォルダ未設定 → 設定画面へ
+  } else {
+    wbDownload(); wbHideBanner();
+  }
+};
+$("#wb-banner-later").onclick = ()=>{
+  localStorage.setItem(WB_SNOOZE_KEY, String(Date.now()+24*60*60*1000));  // 1日あとに再通知
+  wbHideBanner();
+};
+
+renderAll();
+wbCheck();
+// ---------- バージョン ----------
+const APP_VERSION = '1.2.0';
+document.getElementById('versionLabel').textContent = 'v' + APP_VERSION + ' / マイクレカデッキ';
+  // ---------- Service Worker + 自動アップデート ----------
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', async () => {
+      try {
+        const swUrl = new URL('sw.js', location.href).href;
+        const res = await fetch(swUrl, { method: 'HEAD' });
+        if (!res.ok) return;
+        const reg = await navigator.serviceWorker.register('sw.js');
+        if (reg.waiting && navigator.serviceWorker.controller) showUpdateBanner(reg.waiting);
+        reg.addEventListener('updatefound', () => {
+          const sw = reg.installing;
+          if (!sw) return;
+          sw.addEventListener('statechange', () => {
+            if (sw.state === 'installed' && navigator.serviceWorker.controller) showUpdateBanner(sw);
+          });
+        });
+        reg.update();
+        document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') reg.update(); });
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (refreshing) return; refreshing = true; window.location.reload();
+        });
+      } catch (e) {}
+    });
+  }
+  function showUpdateBanner(waitingSW) {
+    if (document.getElementById('updateBanner')) return;
+    const b = document.createElement('button');
+    b.id = 'updateBanner';
+    b.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg><span>新しいバージョンがあります — タップで更新</span>';
+    b.addEventListener('click', () => {
+      b.disabled = true; b.querySelector('span').textContent = '更新中…';
+      waitingSW.postMessage('SKIP_WAITING');
+    });
+    document.body.appendChild(b);
+    requestAnimationFrame(() => b.classList.add('show'));
+  }
+</script>
+</body>
+</html>
