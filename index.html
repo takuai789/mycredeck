@@ -7,7 +7,7 @@
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="クレカデッキ" />
-<meta name="theme-color" content="#0a0a0c" />
+<meta name="theme-color" content="#000000" />
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="apple-touch-icon" href="icon-192.png" />
 <title>マイクレカデッキ</title>
@@ -820,21 +820,140 @@
   #updateBanner{position:fixed;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom) + 16px);z-index:1000;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(180deg,#e6c77f,#b98f43);color:#1a1408;border:0;border-radius:14px;padding:14px 18px;font-family:inherit;font-size:14px;font-weight:600;box-shadow:0 8px 28px rgba(0,0,0,.6);cursor:pointer;transform:translateY(140%);transition:transform .35s cubic-bezier(.32,.72,0,1)}
   #updateBanner.show{transform:translateY(0)}
   #updateBanner svg{display:block;flex-shrink:0}
+  /* =========================================================
+     iPhoneアプリ風（v1.7.0）: SFフォント・大きいタイトル・グループ表示・下のタブバー・下から出るシート
+     ========================================================= */
+  :root{
+    --bg:#000; --paper:#1c1c1e; --fill:#2c2c2e;
+    --ink:#fff; --ink-2:rgba(235,235,245,.72); --ink-3:rgba(235,235,245,.45);
+    --rule:rgba(84,84,88,.5); --rule-strong:rgba(84,84,88,.75);
+    --gold:#e0b862; --gold-2:#b9934a; --accent:#e0b862;
+    --sf:-apple-system,BlinkMacSystemFont,"SF Pro Text","Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
+  }
+  body{background:#000;font-family:var(--sf)}
+  body :not(.cc):not(.cc *){font-family:var(--sf) !important;letter-spacing:normal !important;text-transform:none !important}
+  .wrap{padding:calc(env(safe-area-inset-top) + 10px) 16px calc(env(safe-area-inset-bottom) + 96px);max-width:1100px}
+  header.ios-nav{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;border:0;border-image:none;padding:6px 4px 0;margin:0 0 14px}
+  .ios-nav .kicker,.ios-nav .sub,.ios-nav .meta{display:none}
+  .ios-nav h1{font-size:34px;font-weight:700;line-height:1.15;margin:0;background:none;-webkit-background-clip:border-box;background-clip:border-box;color:#fff;-webkit-text-fill-color:#fff}
+  .nav-add{flex-shrink:0;width:36px;height:36px;border-radius:50%;padding:0;display:flex;align-items:center;justify-content:center;background:var(--fill);color:var(--gold);border:0;margin-bottom:4px}
+  .nav-add:hover{background:var(--fill);transform:none}
+  .nav-add:active{opacity:.6}
+
+  .summary{display:grid;grid-template-columns:1fr 1fr;gap:10px;background:none;border:0;box-shadow:none;border-radius:0;overflow:visible;margin:0 0 22px}
+  .stat{background:var(--paper);border:0 !important;border-radius:14px;padding:12px 14px}
+  .stat.svc-breakdown{grid-column:1/-1}
+  .summary.hidden{display:none}
+  .year-nav button,.year-nav .y{border:0 !important}
+  @media (min-width:760px){.summary{grid-template-columns:1fr 1fr 1.6fr}.stat.svc-breakdown{grid-column:auto}}
+  .stat .l{color:var(--ink-3);font-size:13px;font-weight:500}
+  .stat .v{color:#fff;font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.25;margin-top:2px}
+  .stat .v small{font-size:14px;font-weight:600;color:var(--ink-3);margin-left:2px}
+  #s-fee{color:#fff}
+  #s-fee-orig{display:block;font-size:12px;font-weight:500}
+  .svc-breakdown .breakdown{gap:6px 14px;margin-top:6px}
+  .svc-breakdown .bd-item{font-size:14px;color:var(--ink-2)}
+  .svc-breakdown .bd-item b{font-size:15px;font-weight:700;color:#fff}
+
+  .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:40;display:flex;justify-content:space-around;padding:6px 10px calc(env(safe-area-inset-bottom) + 4px);background:rgba(18,18,20,.82);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-top:.5px solid var(--rule-strong);margin:0}
+  .tabbar .tab{flex:1;max-width:160px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10.5px;font-weight:500;color:#8e8e93;padding:3px 0 2px;margin:0;border:0 !important;border-radius:0;background:none !important}
+  .tabbar .tab svg{width:27px;height:27px;display:block}
+  .tabbar .tab.active{color:var(--gold)}
+  .tabbar .tab:hover{transform:none}
+  body.keyboard-open .tabbar{display:none}
+
+  .toolbar{justify-content:flex-end;margin-bottom:10px}
+  .toolbar h2{display:none}
+  #add,#add2{display:none}
+  button{border-radius:999px;border:0;background:var(--gold);color:#1a1408;font-weight:600}
+  button:hover{background:var(--gold);transform:none}
+  button:active{opacity:.65}
+  button.ghost,button.ghost:hover{background:var(--paper);color:var(--gold);border:0}
+  .controls button.ghost.on{background:rgba(224,184,98,.18);color:var(--gold);border:0}
+  .year-nav{background:var(--paper);border:0;border-radius:999px}
+  .year-nav button{color:var(--gold);border:0}
+  .year-nav .y{color:#fff;font-weight:600}
+
+  .matrix-wrap{background:var(--paper);border:0;border-radius:14px}
+  table.matrix thead th{background:var(--paper);color:var(--ink-3);font-weight:600}
+  table.matrix tbody td{border-color:var(--rule)}
+  .legend{background:transparent;color:var(--ink-3)}
+
+  .line{background:var(--paper);border:0;border-radius:16px;box-shadow:none}
+  .line-meta .k{color:var(--ink-3)}
+  .empty{border:0;background:var(--paper);border-radius:14px}
+
+  /* シート（下から出る） */
+  .modal-bg{align-items:flex-end;padding:0;background:rgba(0,0,0,.5);-webkit-backdrop-filter:none;backdrop-filter:none;overflow:hidden}
+  .modal{max-width:640px;width:100%;border:0;border-radius:14px 14px 0 0;background:var(--paper);box-shadow:0 -10px 40px rgba(0,0,0,.5);max-height:calc(var(--app-height, 100vh) - env(safe-area-inset-top) - 16px);overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:env(safe-area-inset-bottom)}
+  @media (min-width:760px){.modal-bg{align-items:center;padding:24px}.modal{border-radius:16px;padding-bottom:0}}
+  .modal header{position:sticky;top:0;z-index:3;background:var(--paper);padding:20px 16px 12px;border-bottom:.5px solid var(--rule)}
+  .modal header::before{content:"";position:absolute;left:50%;top:6px;width:36px;height:5px;margin-left:-18px;border-radius:3px;background:rgba(235,235,245,.3)}
+  .modal header h3{font-size:17px;font-weight:600}
+  .modal header .hint{font-size:12px;color:var(--ink-3)}
+  .modal .close{width:30px;height:30px;padding:0;border-radius:50%;background:var(--fill);color:var(--ink-2);font-size:17px;line-height:30px;text-align:center}
+  .modal .close:hover{background:var(--fill)}
+  form{padding:14px 16px 6px;gap:12px}
+  label span{font-size:12.5px;color:var(--ink-3);font-weight:500}
+  input,select,textarea{font-size:16px;background:var(--fill);border:0;border-radius:10px;padding:11px 12px;color:#fff}
+  input:focus,select:focus,textarea:focus{box-shadow:0 0 0 2px rgba(224,184,98,.55)}
+  .svc-seg label span,.network-seg label span{color:inherit;font-size:14px}
+  .modal header{border-image:none}
+  #f-type label[data-t].sel{background:var(--gold);border-radius:7px}
+  .form-sec{color:var(--ink-3);font-size:13px;font-weight:600;border-bottom-color:var(--rule)}
+  .form-actions{position:sticky;bottom:0;z-index:3;background:var(--paper);border-top:.5px solid var(--rule);padding:12px 16px 14px}
+  .form-actions button{padding:11px 20px;font-size:16px}
+  .svc-seg,.network-seg{background:var(--fill);border:0;border-radius:9px;padding:2px}
+  footer{border-top:0;color:var(--ink-3);font-size:12px;justify-content:center;text-align:center}
+  .wb-banner{background:var(--paper);border:0;border-radius:14px}
+  #updateBanner{bottom:calc(env(safe-area-inset-bottom) + 72px);background:var(--gold);border-radius:14px}
+
+  /* 引き落としビュー */
+  .pay-hero{background:linear-gradient(150deg,#2a2418,#1c1c1e 70%);border-radius:16px;padding:16px 16px 14px;margin-bottom:22px}
+  .pay-hero-l{font-size:13px;font-weight:600;color:var(--gold)}
+  .pay-hero-d{display:flex;align-items:baseline;gap:6px;margin-top:4px;flex-wrap:wrap}
+  .pay-hero-d b{font-size:30px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums}
+  .pay-hero-d span{font-size:16px;color:var(--ink-2)}
+  .pay-hero-d em{font-style:normal;margin-left:auto;font-size:14px;font-weight:700;color:#1a1408;background:var(--gold);border-radius:999px;padding:3px 10px}
+  .pay-hero-s{font-size:12px;color:var(--ink-3);margin-top:2px}
+  .pay-hero-c{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+  .pay-hero-c span{font-size:14px;font-weight:600;color:#fff;background:rgba(255,255,255,.08);border-radius:8px;padding:5px 9px}
+  .pay-hero-c i{font-style:normal;font-weight:400;color:var(--ink-3);margin-left:4px;font-size:12.5px}
+  .pay-sec{margin-bottom:18px}
+  .pay-hd{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:0 6px 6px}
+  .pay-day{font-size:13px;font-weight:600;color:var(--ink-3)}
+  .pay-day b{font-size:20px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;margin:0 1px}
+  .pay-when{font-size:12.5px;color:var(--ink-3);text-align:right}
+  .pay-when s{opacity:.7}
+  .pay-sec.next .pay-day b,.pay-sec.next .pay-when{color:var(--gold)}
+  .pay-group{background:var(--paper);border-radius:12px;overflow:hidden}
+  .pay-row{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:none;border:0;border-radius:0;padding:11px 14px;color:#fff;font-weight:400;position:relative}
+  .pay-row:hover{background:none}
+  .pay-row:active{background:rgba(255,255,255,.06);opacity:1}
+  .pay-row + .pay-row::before{content:"";position:absolute;top:0;left:38px;right:0;border-top:.5px solid var(--rule)}
+  .pay-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+  .pay-main{display:flex;flex-direction:column;min-width:0;flex:1}
+  .pay-card{font-size:16px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pay-sub{font-size:13px;color:var(--ink-3);margin-top:1px}
+  .pay-miss{color:#ff9f0a}
+  .pay-chev{font-size:22px;color:rgba(235,235,245,.3);line-height:1}
+  .pay-foot{font-size:12px;color:var(--ink-3);line-height:1.6;padding:0 6px;margin:6px 0 0}
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <header>
+  <header class="ios-nav">
     <div class="brand">
       <span class="kicker">My Card Deck</span>
-      <h1>マイクレカデッキ</h1>
+      <h1 id="navTitle">年表</h1>
       <span class="sub">Credit Cards · Annual Fee Tracker</span>
     </div>
     <div class="meta">
       <div>更新 <b id="now">—</b></div>
       <div>保存先 <b>このブラウザ</b></div>
     </div>
+    <button type="button" class="nav-add" id="navAdd" aria-label="カードを追加"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
   </header>
 
   <div class="wb-banner" id="wb-banner" style="display:none">
@@ -847,17 +966,18 @@
 
   <section class="summary">
     <div class="stat"><div class="l">保有中のカード</div><div class="v" id="s-active">0<small>枚</small></div></div>
-    <div class="stat"><div class="l">年会費 / 年（実質・税込）</div><div class="v">¥<span id="s-fee">0</span><small id="s-fee-orig"></small></div></div>
+    <div class="stat"><div class="l">年会費 / 年（実質）</div><div class="v">¥<span id="s-fee">0</span><small id="s-fee-orig"></small></div></div>
     <div class="stat svc-breakdown">
       <div class="l">ブランド内訳</div>
       <div class="breakdown" id="s-breakdown"></div>
     </div>
   </section>
 
-  <div class="tabs">
-    <button class="tab active" data-view="matrix">年表ビュー</button>
-    <button class="tab" data-view="cards">カードビュー</button>
-  </div>
+  <nav class="tabbar">
+    <button type="button" class="tab active" data-view="matrix"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="3"/><path d="M3 9.5h18M8 3v3M16 3v3"/><path d="M7 13.5h3M14 13.5h3M7 17h3"/></svg><span>年表</span></button>
+    <button type="button" class="tab" data-view="cards"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5.5" width="19" height="13" rx="2.5"/><path d="M2.5 9.5h19M6 15h4"/></svg><span>カード</span></button>
+    <button type="button" class="tab" data-view="pay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10 12 4.5 21 10"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20.5h18"/></svg><span>引き落とし</span></button>
+  </nav>
 
   <div id="view-matrix">
     <div class="toolbar">
@@ -903,6 +1023,12 @@
     <div id="cards" class="lines"></div>
   </div>
 
+  <div id="view-pay" class="hidden">
+    <div id="pay-next"></div>
+    <div id="pay-list"></div>
+    <p class="pay-foot">利用中のカードの「支払日」を、毎月の日付順に並べています。土日は翌営業日としてずらして表示（祝日は考慮していません）。行をタップすると編集できます。</p>
+  </div>
+
   <footer>
     <span>Local-only · データはこの端末にのみ保存されます</span>
     <span id="versionLabel"></span>
@@ -921,7 +1047,7 @@
     <form id="form">
       <input type="hidden" id="f-id"/>
       <div class="row">
-        <label><span>カード名</span><input id="f-name" required placeholder="楽天カード、三井住友ゴールド …"/></label>
+        <label><span>カード名</span><input id="f-name" required autocomplete="off" placeholder="楽天カード、三井住友ゴールド …"/></label>
         <label><span>用途</span><input id="f-purpose" placeholder="メイン、ネット決済、サブスク用 …"/></label>
       </div>
       <div class="form-sec">ポイント</div>
@@ -1522,17 +1648,84 @@ function renderCards(){
   $("#count").textContent = `${cards.length} cards`;
 }
 
+// === 引き落とし日ビュー（毎月の口座振替日を日付順に） ===
+function payDayOf(c){
+  const s = String(c.payment||"").trim();
+  if(!s) return null;
+  if(/末/.test(s)) return 31;
+  const m = s.match(/(\d{1,2})/);
+  if(!m) return null;
+  const d = +m[1];
+  return (d>=1 && d<=31) ? d : null;
+}
+const WD = ["日","月","火","水","木","金","土"];
+function payDateIn(y, m, day){ const dim = new Date(y, m+1, 0).getDate(); return new Date(y, m, Math.min(day, dim)); }
+function nextPayDate(day){
+  const t = new Date(); t.setHours(0,0,0,0);
+  let d = payDateIn(t.getFullYear(), t.getMonth(), day);
+  let adj = shiftBiz(d);
+  if(adj < t){ d = payDateIn(t.getFullYear(), t.getMonth()+1, day); adj = shiftBiz(d); }
+  return {date:d, adj, days: Math.round((adj - t)/86400000)};
+}
+function shiftBiz(d){ const x = new Date(d); while(x.getDay()===0 || x.getDay()===6) x.setDate(x.getDate()+1); return x; }
+function mdw(d){ return `${d.getMonth()+1}/${d.getDate()}(${WD[d.getDay()]})`; }
+function daysTxt(n){ return n===0 ? "きょう" : n===1 ? "あした" : `あと${n}日`; }
+function renderPay(){
+  const act = cards.filter(c=>c.status==="active");
+  const groups = new Map(); const unset = [];
+  for(const c of act){
+    const d = payDayOf(c);
+    if(d==null){ unset.push(c); continue; }
+    if(!groups.has(d)) groups.set(d, []);
+    groups.get(d).push(c);
+  }
+  const days = [...groups.keys()].sort((a,b)=>a-b);
+  const info = new Map(days.map(d=>[d, nextPayDate(d)]));
+  let nextDay = null;
+  for(const d of days){ if(nextDay==null || info.get(d).days < info.get(nextDay).days) nextDay = d; }
+  const row = c=>{
+    const bm = brandMeta(c.brand);
+    const raw = String(c.payment||"").trim();
+    const sub = [c.account ? esc(c.account) : `<span class="pay-miss">口座 未入力</span>`];
+    if(c.closing) sub.push(`締め ${esc(/^\d+$/.test(c.closing)?c.closing+"日":c.closing)}`);
+    if(raw && !/^\d+$/.test(raw) && !/^\d+日$/.test(raw)) sub.push(esc(raw));
+    return `<button type="button" class="pay-row" data-pay-edit="${c.id}"><span class="pay-dot" style="background:${bm.c}"></span><span class="pay-main"><span class="pay-card">${esc(c.name||"(名称なし)")}</span><span class="pay-sub">${sub.join(" · ")}</span></span><span class="pay-chev">›</span></button>`;
+  };
+  if(nextDay!=null){
+    const n = info.get(nextDay); const list = groups.get(nextDay);
+    const shifted = n.adj.getTime()!==n.date.getTime();
+    $("#pay-next").innerHTML = `<div class="pay-hero"><div class="pay-hero-l">次の引き落とし</div><div class="pay-hero-d"><b>${n.adj.getMonth()+1}月${n.adj.getDate()}日</b><span>(${WD[n.adj.getDay()]})</span><em>${daysTxt(n.days)}</em></div>${shifted?`<div class="pay-hero-s">${nextDay===31?"末日":nextDay+"日"}が土日のため翌営業日</div>`:""}<div class="pay-hero-c">${list.map(c=>`<span>${esc(c.name||"")}${c.account?` <i>${esc(c.account)}</i>`:""}</span>`).join("")}</div></div>`;
+  } else {
+    $("#pay-next").innerHTML = act.length ? "" : `<div class="empty"><p>まだカードがありません</p><small>右上の ＋ から登録</small></div>`;
+  }
+  let html = "";
+  for(const d of days){
+    const n = info.get(d); const shifted = n.adj.getTime()!==n.date.getTime();
+    html += `<div class="pay-sec${d===nextDay?" next":""}"><div class="pay-hd"><span class="pay-day">毎月 <b>${d===31?"末":d}</b>日</span><span class="pay-when">${shifted?`<s>${mdw(n.date)}</s> → `:""}${mdw(n.adj)} · ${daysTxt(n.days)}</span></div><div class="pay-group">${groups.get(d).map(row).join("")}</div></div>`;
+  }
+  if(unset.length){
+    html += `<div class="pay-sec"><div class="pay-hd"><span class="pay-day">支払日が未入力</span></div><div class="pay-group">${unset.map(row).join("")}</div></div>`;
+  }
+  $("#pay-list").innerHTML = html;
+}
+$("#pay-list").addEventListener("click", e=>{
+  const id = e.target.closest("[data-pay-edit]")?.dataset.payEdit;
+  if(id){ const c = cards.find(x=>x.id===id); if(c) openModal(c); }
+});
+
 function renderAll(){
   const d = new Date();
   $("#now").textContent = `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,"0")}.${String(d.getDate()).padStart(2,"0")} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
   renderSummary();
-  if(currentView==="matrix") renderMatrix(); else renderCards();
+  if(currentView==="matrix") renderMatrix(); else if(currentView==="pay") renderPay(); else renderCards();
   // datalist
   $("#issuer-list").innerHTML = KNOWN_ISSUERS.map(i=>`<option value="${esc(i)}">`).join("");
   $("#point-list").innerHTML = KNOWN_POINTS.map(i=>`<option value="${esc(i)}">`).join("");
 }
 
 // === タブ切替 ===
+const VIEW_TITLE = {matrix:"年表", cards:"カード", pay:"引き落とし"};
+$("#navAdd").onclick = ()=>openModal(null);
 $$(".tab").forEach(t=>{
   t.onclick = ()=>{
     $$(".tab").forEach(x=>x.classList.remove("active"));
@@ -1540,6 +1733,10 @@ $$(".tab").forEach(t=>{
     currentView = t.dataset.view;
     $("#view-matrix").classList.toggle("hidden", currentView!=="matrix");
     $("#view-cards").classList.toggle("hidden", currentView!=="cards");
+    $("#view-pay").classList.toggle("hidden", currentView!=="pay");
+    $(".summary").classList.toggle("hidden", currentView==="pay");
+    $("#navTitle").textContent = VIEW_TITLE[currentView] || "";
+    window.scrollTo(0,0);
     renderAll();
   };
 });
@@ -2113,7 +2310,7 @@ $("#wb-banner-later").onclick = ()=>{
 renderAll();
 wbCheck();
 // ---------- バージョン ----------
-const APP_VERSION = '1.6.0';
+const APP_VERSION = '1.7.0';
 document.getElementById('versionLabel').textContent = 'v' + APP_VERSION + ' / マイクレカデッキ';
   // ---------- Service Worker + 自動アップデート ----------
   if ('serviceWorker' in navigator) {
