@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
 <meta name="apple-mobile-web-app-title" content="クレカデッキ" />
 <meta name="theme-color" content="#000000" />
 <link rel="manifest" href="manifest.webmanifest" />
@@ -939,6 +939,7 @@
   .pay-chev{font-size:22px;color:rgba(235,235,245,.3);line-height:1}
   .pay-foot{font-size:12px;color:var(--ink-3);line-height:1.6;padding:0 6px;margin:6px 0 0}
 </style>
+<script>/* iPhoneが容量不足のときに保存データを消さないよう、端末にお願いしておく */try{navigator.storage&&navigator.storage.persist&&navigator.storage.persisted().then(function(p){if(!p)navigator.storage.persist();});}catch(e){}</script>
 </head>
 <body>
 <div class="wrap">
@@ -1855,7 +1856,7 @@ $("#form").addEventListener("submit", e=>{
     cashLimit: $("#f-cash").value==="" ? "" : Math.max(0, +$("#f-cash").value||0),
     note: $("#f-note").value.trim(),
   };
-  if(!data.name){ alert("カード名を入力してください"); return; }
+  if(!data.name){ uiToast("カード名を入力してください"); return; }
   if(id){
     const i = cards.findIndex(c=>c.id===id);
     if(i>=0) cards[i] = {...cards[i], ...data};
@@ -1866,14 +1867,14 @@ $("#form").addEventListener("submit", e=>{
 });
 
 // === カードビュー操作 ===
-$("#cards").addEventListener("click", e=>{
+$("#cards").addEventListener("click", async e=>{
   const ed = e.target.dataset.edit;
   const dl = e.target.dataset.del;
   const st = e.target.closest("[data-status]")?.dataset.status;
   if(ed){ const c=cards.find(x=>x.id===ed); if(c) openModal(c); }
   if(dl){
     const c=cards.find(x=>x.id===dl);
-    if(c && confirm(`「${c.name}」を削除しますか?\nこの操作は元に戻せません (直前の状態はスナップショットに残ります)。`)){
+    if(c && (await uiAsk(`「${c.name}」を削除しますか?\nこの操作は元に戻せません (直前の状態はスナップショットに残ります)。`, "削除する"))){
       cards = cards.filter(x=>x.id!==dl); save(cards); renderAll();
     }
   }
@@ -2094,13 +2095,13 @@ $("#backup-import-file").addEventListener("change", async e=>{
   }catch(err){ mcToast(`取り込めませんでした（${err.message}）`); }
   e.target.value="";
 });
-$("#snap-list").addEventListener("click", e=>{
+$("#snap-list").addEventListener("click", async e=>{
   const r=e.target.dataset.snapRestore, d=e.target.dataset.snapDownload, x=e.target.dataset.snapDelete;
   if(r!==undefined){
     const s=loadSnapshots()[+r]; if(!s) return;
-    if(!confirm(`${fmtSnapTime(s.ts)} の状態 (${s.count}枚) に戻しますか?\n\n現在のデータは新しいスナップショットとして自動保存されます。`)) return;
+    if(!(await uiAsk(`${fmtSnapTime(s.ts)} の状態 (${s.count}枚) に戻しますか?\n\n現在のデータは新しいスナップショットとして自動保存されます。`, "戻す"))) return;
     pushSnapshot(cards);
-    try{ cards=JSON.parse(s.payload); save(cards); renderAll(); renderSnapshots(); }catch(err){ alert("復元失敗: "+err.message); }
+    try{ cards=JSON.parse(s.payload); save(cards); renderAll(); renderSnapshots(); }catch(err){ uiToast("復元できませんでした: "+err.message); }
   }
   if(d!==undefined){
     const s=loadSnapshots()[+d]; if(!s) return;
@@ -2110,7 +2111,7 @@ $("#snap-list").addEventListener("click", e=>{
   }
   if(x!==undefined){
     const snaps=loadSnapshots(); const s=snaps[+x]; if(!s) return;
-    if(!confirm(`${fmtSnapTime(s.ts)} のスナップショットを削除しますか?`)) return;
+    if(!(await uiAsk(`${fmtSnapTime(s.ts)} のスナップショットを削除しますか?`, '削除する'))) return;
     snaps.splice(+x,1); saveSnapshots(snaps); renderSnapshots();
   }
 });
@@ -2310,7 +2311,7 @@ $("#wb-banner-later").onclick = ()=>{
 renderAll();
 wbCheck();
 // ---------- バージョン ----------
-const APP_VERSION = '1.7.0';
+const APP_VERSION = '1.8.0';
 document.getElementById('versionLabel').textContent = 'v' + APP_VERSION + ' / マイクレカデッキ';
   // ---------- Service Worker + 自動アップデート ----------
   if ('serviceWorker' in navigator) {
@@ -2390,6 +2391,14 @@ document.getElementById('versionLabel').textContent = 'v' + APP_VERSION + ' / �
     window.addEventListener('orientationchange', () => setTimeout(() => { baseH = vv.height; follow(600); }, 300));
     apply();
   })();
+</script>
+<div id="ui-toast" style="position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 16px);transform:translateX(-50%);background:rgba(28,28,30,.94);color:#fff;padding:11px 18px;border-radius:12px;font-size:14px;z-index:9000;opacity:0;pointer-events:none;transition:opacity .25s;max-width:90vw;text-align:center;font-family:inherit"></div>
+<div id="ui-ask" style="position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:9001;padding:24px"><div style="background:#fff;color:#1c1c1e;border-radius:16px;padding:20px 18px 14px;max-width:330px;width:100%;font-family:inherit"><p id="ui-ask-msg" style="margin:0 0 16px;font-size:15px;line-height:1.7;white-space:pre-line;text-align:center"></p><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><button type="button" id="ui-ask-no" style="padding:11px;border-radius:10px;border:0;background:rgba(0,0,0,.07);color:inherit;font:inherit;font-size:15px;font-weight:700">やめる</button><button type="button" id="ui-ask-yes" style="padding:11px;border-radius:10px;border:0;background:#E5484D;color:#fff;font:inherit;font-size:15px;font-weight:700">OK</button></div></div></div>
+<script>
+  // 自前のお知らせ・確認（iPhoneのホーム画面アプリでは alert/confirm が出ないことがあるため）
+  let _uiT = 0;
+  function uiToast(msg){ const t=document.getElementById('ui-toast'); t.textContent=msg; t.style.opacity='1'; clearTimeout(_uiT); _uiT=setTimeout(()=>{t.style.opacity='0';}, 2400); }
+  function uiAsk(msg, yes){ return new Promise(res=>{ const bg=document.getElementById('ui-ask'); document.getElementById('ui-ask-msg').textContent=msg; const y=document.getElementById('ui-ask-yes'), n=document.getElementById('ui-ask-no'); y.textContent=yes||'OK'; bg.style.display='flex'; const done=v=>{ bg.style.display='none'; y.onclick=n.onclick=null; res(v); }; y.onclick=()=>done(true); n.onclick=()=>done(false); }); }
 </script>
 </body>
 </html>
